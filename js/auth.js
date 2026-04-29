@@ -2,15 +2,17 @@ import { supabase } from './supabase.js'
 
 // Sign up
 export async function signUp(email, password, username) {
-  const { data, error } = await supabase.auth.signUp({ email, password })
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        username
+      }
+    }
+  })
+
   if (error) throw error
-
-  // Set username on profile
-  await supabase
-    .from('profiles')
-    .update({ username })
-    .eq('id', data.user.id)
-
   return data
 }
 
