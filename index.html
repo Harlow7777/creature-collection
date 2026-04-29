@@ -1,0 +1,26 @@
+<script type="module">
+  import { signIn, signUp } from './js/auth.js'
+
+  document.getElementById('login-btn').addEventListener('click', async () => {
+    const email = document.getElementById('email').value
+    const password = document.getElementById('password').value
+    try {
+      await signIn(email, password)
+      window.location.href = '/app.html'
+    } catch (err) {
+      document.getElementById('error-msg').textContent = err.message
+    }
+  })
+
+  document.getElementById('signup-btn').addEventListener('click', async () => {
+    const email = document.getElementById('email').value
+    const password = document.getElementById('password').value
+    const username = document.getElementById('username').value
+    try {
+      await signUp(email, password, username)
+      alert('Check your email to confirm your account!')
+    } catch (err) {
+      document.getElementById('error-msg').textContent = err.message
+    }
+  })
+</script>

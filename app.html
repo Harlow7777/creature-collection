@@ -1,0 +1,10 @@
+<script type="module">
+  import { requireAuth } from './js/auth.js'
+
+  // Redirects to index if not logged in
+  const session = await requireAuth()
+
+  // Now safe to load user data
+  import { loadCollection } from './js/pages/collection.js'
+  loadCollection(session.user.id)
+</script>
