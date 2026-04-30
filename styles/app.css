@@ -24,15 +24,6 @@
    GLOBAL UTILITIES
 ========================= */
 
-.app {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: var(--nav-w) 1fr;
-    grid-template-rows: 1fr;
-    height: 100vh;
-}
-
 /* Page Content */
 .pages {
     flex: 1;

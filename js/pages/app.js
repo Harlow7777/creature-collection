@@ -70,6 +70,8 @@ async function bootstrap() {
   }
   showLoading(false)
   updateUI()
+  // Refresh the battle fighter grid now that the collection is loaded
+  if (window.refreshBattleSelectGrid) window.refreshBattleSelectGrid()
 }
 
 async function loadCreatureTemplates() {
@@ -405,6 +407,10 @@ function switchToPage(page) {
 
   if (page === 'devtools') {
     renderDevToolsPage(state)
+  }
+
+  if (page === 'battle' && window.refreshBattleSelectGrid) {
+    window.refreshBattleSelectGrid()
   }
 }
 

@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet" />
 
   <!-- MAIN BUNDLE -->
-  <link rel="stylesheet" href="../../styles/app.css" />
+  <link rel="stylesheet" href="./styles/app.css" />
 </head>
 
 <body>
@@ -175,31 +175,54 @@
 
         <div class="battle-arena">
 
-          <div class="fighter active" id="fighter-you">
-            <div class="fighter-sprite">⚔️</div>
-            <div class="fighter-name">Choose a fighter</div>
-            <div class="hp-bar-wrap"><div class="hp-bar"></div></div>
-            <div class="hp-text">— / —</div>
+          <!-- YOUR SIDE -->
+          <div class="fighter-column">
+
+            <!-- Fighter select panel (shown when no fighter chosen) -->
+            <div class="fighter-select-panel" id="fighter-select-panel">
+              <div class="fighter-select-header">Choose Your Fighter</div>
+              <div class="fighter-select-grid" id="fighter-select-grid">
+                <div class="fighter-select-empty">No creatures yet — go roll some!</div>
+              </div>
+            </div>
+
+            <!-- Fighter card (shown once fighter is chosen) -->
+            <div class="fighter active hidden" id="fighter-you">
+              <div class="fighter-sprite" id="you-sprite"></div>
+              <div class="fighter-name" id="you-name"></div>
+              <div class="hp-bar-wrap"><div class="hp-bar" id="you-hp-bar"></div></div>
+              <div class="hp-text" id="you-hp-text">— / —</div>
+              <button class="btn-fighter-action btn-attack" id="btn-attack" disabled>⚔️ Attack</button>
+              <button class="btn-fighter-action btn-swap" id="btn-swap-fighter">↩ Swap Fighter</button>
+            </div>
+
           </div>
 
           <div class="vs-badge">VS</div>
 
-          <div class="fighter" id="fighter-opp">
-            <div class="fighter-sprite">🌫️</div>
-            <div class="fighter-name">Awaiting...</div>
-            <div class="hp-bar-wrap"><div class="hp-bar"></div></div>
-            <div class="hp-text">— / —</div>
+          <!-- OPP SIDE -->
+          <div class="fighter-column">
+
+            <!-- Find opponent panel (shown when no opponent) -->
+            <div class="fighter find-opponent-panel" id="find-opponent-panel">
+              <div class="fighter-sprite">🌫️</div>
+              <div class="fighter-name">No Opponent</div>
+              <button class="btn-fighter-action btn-find-opp" id="btn-find-opponent">🎲 Find Opponent</button>
+            </div>
+
+            <!-- Opponent card (shown once opponent is found) -->
+            <div class="fighter hidden" id="fighter-opp">
+              <div class="fighter-sprite" id="opp-sprite"></div>
+              <div class="fighter-name" id="opp-name"></div>
+              <div class="hp-bar-wrap"><div class="hp-bar" id="opp-hp-bar"></div></div>
+              <div class="hp-text" id="opp-hp-text">— / —</div>
+            </div>
+
           </div>
 
         </div>
 
-        <div class="battle-log" id="battle-log"></div>
 
-        <div class="battle-actions">
-          <button class="btn-battle primary" id="btn-choose-fighter">Choose Fighter</button>
-          <button class="btn-battle" id="btn-find-opponent">Find Opponent</button>
-          <button class="btn-battle" id="btn-attack" disabled>Attack</button>
-        </div>
 
       </div>
 
