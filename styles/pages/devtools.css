@@ -1,0 +1,40 @@
+.dev-tools-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.dev-input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.dev-input-row span {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.dev-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface2);
+  color: var(--text);
+  padding: 10px 12px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.9rem;
+}
+
+.dev-input:focus {
+  outline: 1px solid var(--accent);
+  border-color: var(--accent);
+}
+
+.dev-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}

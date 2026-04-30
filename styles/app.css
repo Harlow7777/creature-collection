@@ -1,0 +1,203 @@
+@import "./core/reset.css";
+@import "./core/variables.css";
+
+@import "./layout/app-layout.css";
+
+@import "./sidebar/sidebar.css";
+
+@import "./pages/collection.css";
+@import "./pages/roll.css";
+@import "./pages/battle.css";
+@import "./pages/shop.css";
+@import "./pages/profile.css";
+@import "./pages/areas.css";
+@import "./pages/devtools.css";
+
+@import "./components/buttons.css";
+@import "./components/cards.css";
+@import "./components/modal.css";
+@import "./components/toast.css";
+
+@import "./utilities/helpers.css";
+
+/* =========================
+   GLOBAL UTILITIES
+========================= */
+
+.app {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: var(--nav-w) 1fr;
+    grid-template-rows: 1fr;
+    height: 100vh;
+}
+
+/* Page Content */
+.pages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 32px;
+}
+
+.page {
+    display: none;
+    animation: page-in 0.2s ease;
+}
+
+.page.active {
+    display: block;
+}
+
+/* Top bar */
+.topbar {
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.topbar-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1rem;
+    color: var(--accent);
+}
+
+.topbar-meta {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+}
+
+.muted-text {
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.center-muted {
+    text-align: center;
+    color: var(--muted);
+    font-style: italic;
+}
+
+.accent-text {
+    color: var(--accent);
+}
+
+.gold-text {
+    color: var(--gold);
+}
+
+.rare-text {
+    color: var(--rare);
+}
+
+.spacer-sm {
+    margin-top: 8px;
+}
+
+.spacer-md {
+    margin-top: 16px;
+}
+
+.spacer-lg {
+    margin-top: 32px;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gap-sm {
+    gap: 6px;
+}
+
+.gap-md {
+    gap: 12px;
+}
+
+.gap-lg {
+    gap: 20px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+}
+
+/* Responsive collapse sidebar */
+@media (max-width: 768px) {
+    .app {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        flex-direction: row;
+        border-right: none;
+        border-top: 1px solid var(--border);
+        z-index: 50;
+    }
+
+    .sidebar-logo,
+    .user-strip,
+    .nav-section-label,
+    .sidebar-footer {
+        display: none;
+    }
+
+    .nav {
+        flex-direction: row;
+        padding: 0;
+        overflow-x: auto;
+        justify-content: space-around;
+    }
+
+    .nav-item {
+        flex-direction: column;
+        gap: 2px;
+        padding: 8px 4px;
+        font-size: 0.62rem;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .nav-item.active::before {
+        display: none;
+    }
+
+    .pages {
+        padding: 16px;
+        padding-bottom: 80px;
+    }
+
+    .profile-grid,
+    .battle-arena {
+        grid-template-columns: 1fr;
+    }
+
+    .showcase {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

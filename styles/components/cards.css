@@ -1,0 +1,12 @@
+.panel-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.showcase-slot {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}

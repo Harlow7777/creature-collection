@@ -1,0 +1,15 @@
+.center-muted {
+  text-align: center;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.accent-text { color: var(--accent); }
+.gold-text { color: var(--gold); }
+.rare-text { color: var(--rare); }
+
+.flex { display: flex; }
+.col { display: flex; flex-direction: column; }
+
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }

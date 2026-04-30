@@ -1,887 +1,48 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Monstrum</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --bg: #0a0a0f;
-      --surface: #12121a;
-      --surface2: #1a1a26;
-      --surface3: #20202e;
-      --border: rgba(160, 130, 255, 0.15);
-      --border2: rgba(160, 130, 255, 0.25);
-      --accent: #a07aff;
-      --accent2: #ff7aad;
-      --gold: #f5c842;
-      --text: #e8e0ff;
-      --muted: #7a7090;
-      --rare: #4af0c8;
-      --nav-w: 220px;
-    }
-
-    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Crimson Pro', Georgia, serif; overflow: hidden; }
-
-    /* Star bg */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image:
-        radial-gradient(1px 1px at 15% 25%, rgba(160,122,255,0.5) 0%, transparent 100%),
-        radial-gradient(1px 1px at 75% 15%, rgba(255,122,173,0.4) 0%, transparent 100%),
-        radial-gradient(1px 1px at 45% 75%, rgba(74,240,200,0.3) 0%, transparent 100%),
-        radial-gradient(1px 1px at 85% 60%, rgba(160,122,255,0.3) 0%, transparent 100%);
-      background-size: 500px 400px;
-      animation: starfield 80s linear infinite;
-      pointer-events: none; z-index: 0;
-    }
-    @keyframes starfield {
-      from { background-position: 0 0, 100px 50px, 200px 100px, 50px 150px; }
-      to   { background-position: 500px 400px, 600px 450px, 700px 500px, 550px 550px; }
-    }
-
-    /* ── LAYOUT ── */
-    .app {
-      position: relative; z-index: 1;
-      display: grid;
-      grid-template-columns: var(--nav-w) 1fr;
-      grid-template-rows: 1fr;
-      height: 100vh;
-    }
-
-    /* ── SIDEBAR NAV ── */
-    .sidebar {
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      padding: 0;
-      overflow: hidden;
-    }
-
-    .sidebar-logo {
-      padding: 24px 20px 20px;
-      border-bottom: 1px solid var(--border);
-    }
-    .sidebar-logo h1 {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 1rem;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .sidebar-logo .tagline {
-      font-size: 0.75rem;
-      color: var(--muted);
-      font-style: italic;
-      margin-top: 2px;
-    }
-
-    /* User info strip */
-    .user-strip {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .user-name {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-    .currency-row {
-      display: flex;
-      gap: 12px;
-    }
-    .currency-badge {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.82rem;
-      color: var(--muted);
-    }
-    .currency-badge .val { color: var(--gold); font-weight: 600; }
-    .currency-badge .val.rare-val { color: var(--rare); }
-
-    /* Nav items */
-    .nav { flex: 1; padding: 12px 0; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 20px;
-      cursor: pointer;
-      border: none;
-      background: none;
-      color: var(--muted);
-      font-family: 'Crimson Pro', serif;
-      font-size: 0.95rem;
-      text-align: left;
-      width: 100%;
-      border-radius: 0;
-      transition: all 0.15s;
-      position: relative;
-    }
-    .nav-item:hover { color: var(--text); background: var(--surface2); }
-    .nav-item.active {
-      color: var(--accent);
-      background: rgba(160, 122, 255, 0.08);
-    }
-    .nav-item.active::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: var(--accent);
-      border-radius: 0 2px 2px 0;
-    }
-    .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
-
-    .nav-section-label {
-      padding: 12px 20px 4px;
-      font-size: 0.68rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      opacity: 0.6;
-    }
-
-    /* Logout at bottom */
-    .sidebar-footer {
-      padding: 16px 20px;
-      border-top: 1px solid var(--border);
-    }
-    .btn-logout {
-      width: 100%;
-      padding: 8px;
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--muted);
-      font-family: 'Crimson Pro', serif;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-logout:hover { border-color: var(--accent2); color: var(--accent2); }
-
-    /* ── MAIN CONTENT ── */
-    .main {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    /* Top bar */
-    .topbar {
-      padding: 16px 32px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-    .topbar-title {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 1rem;
-      color: var(--accent);
-    }
-    .topbar-meta { font-size: 0.85rem; color: var(--muted); font-style: italic; }
-
-    /* Page content */
-    .pages { flex: 1; overflow-y: auto; padding: 28px 32px; }
-
-    .page { display: none; animation: page-in 0.2s ease; }
-    .page.active { display: block; }
-    @keyframes page-in {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── SHOWCASE (Top 3) ── */
-    .showcase {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    .showcase-slot {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      min-height: 180px;
-      position: relative;
-      transition: border-color 0.2s;
-      cursor: pointer;
-    }
-    .showcase-slot:hover { border-color: var(--border2); }
-    .showcase-slot.empty {
-      border-style: dashed;
-      justify-content: center;
-      opacity: 0.4;
-    }
-    .showcase-slot .rank {
-      position: absolute;
-      top: 10px; left: 14px;
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 0.6rem;
-      color: var(--muted);
-    }
-    .showcase-slot.rank-1 { border-color: rgba(245,200,66,0.3); }
-    .showcase-slot.rank-1 .rank { color: var(--gold); }
-    .showcase-slot.rank-2 { border-color: rgba(160,122,255,0.3); }
-    .showcase-slot.rank-3 { border-color: rgba(74,240,200,0.2); }
-
-    .showcase-sprite { font-size: 52px; line-height: 1; }
-    .showcase-name { font-size: 1rem; font-weight: 600; text-align: center; }
-    .showcase-type { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-    .showcase-level {
-      font-size: 0.78rem;
-      color: var(--accent);
-      background: rgba(160,122,255,0.1);
-      padding: 2px 10px;
-      border-radius: 999px;
-    }
-
-    /* ── SECTION HEADERS ── */
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-    .section-title {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 0.85rem;
-      color: var(--accent);
-      letter-spacing: 0.05em;
-    }
-    .section-count { font-size: 0.8rem; color: var(--muted); }
-
-    /* ── COLLECTION GRID ── */
-    .collection-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 12px;
-    }
-
-    .creature-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      transition: all 0.15s;
-      position: relative;
-      overflow: hidden;
-    }
-    .creature-card:hover {
-      border-color: var(--border2);
-      transform: translateY(-2px);
-    }
-    .creature-card::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 3px;
-    }
-    .creature-card.rarity-legendary::after { background: var(--gold); }
-    .creature-card.rarity-rare::after { background: var(--rare); }
-    .creature-card.rarity-uncommon::after { background: var(--accent); }
-    .creature-card.rarity-common::after { background: var(--muted); }
-
-    .card-sprite { font-size: 38px; line-height: 1; }
-    .card-name { font-size: 0.82rem; font-weight: 600; text-align: center; line-height: 1.2; }
-    .card-type { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-    .card-level { font-size: 0.7rem; color: var(--accent); }
-
-    .rarity-badge {
-      font-size: 0.62rem;
-      padding: 2px 7px;
-      border-radius: 999px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-    .rarity-legendary .rarity-badge { background: rgba(245,200,66,0.15); color: var(--gold); }
-    .rarity-rare .rarity-badge { background: rgba(74,240,200,0.15); color: var(--rare); }
-    .rarity-uncommon .rarity-badge { background: rgba(160,122,255,0.15); color: var(--accent); }
-    .rarity-common .rarity-badge { background: rgba(122,112,144,0.15); color: var(--muted); }
-
-    .xp-bar-wrap {
-      width: 100%;
-      height: 3px;
-      background: var(--surface2);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .xp-bar { height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.4s; }
-
-    /* Empty state */
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
-      font-style: italic;
-    }
-    .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
-
-    /* ── ROLL PAGE ── */
-    .roll-center {
-      max-width: 600px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 32px;
-    }
-
-    .roll-portal {
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      background: radial-gradient(circle at center, rgba(160,122,255,0.15) 0%, transparent 70%);
-      border: 1px solid var(--border2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .roll-portal:hover {
-      box-shadow: 0 0 60px rgba(160,122,255,0.15);
-      border-color: var(--accent);
-    }
-    .roll-portal.spinning {
-      animation: portal-spin 0.6s ease-in-out;
-    }
-    @keyframes portal-spin {
-      0% { transform: scale(1) rotate(0deg); }
-      50% { transform: scale(1.08) rotate(180deg); }
-      100% { transform: scale(1) rotate(360deg); }
-    }
-
-    .roll-orb {
-      font-size: 72px;
-      transition: all 0.3s;
-      filter: drop-shadow(0 0 20px rgba(160,122,255,0.3));
-    }
-
-    .roll-ring {
-      position: absolute;
-      inset: -6px;
-      border-radius: 50%;
-      border: 1px solid transparent;
-      border-top-color: var(--accent);
-      border-right-color: var(--accent2);
-      animation: ring-spin 8s linear infinite;
-    }
-    @keyframes ring-spin { to { transform: rotate(360deg); } }
-
-    .roll-btn {
-      padding: 16px 48px;
-      background: linear-gradient(135deg, var(--accent), #7a5aff);
-      border: none;
-      border-radius: 10px;
-      color: #fff;
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 1rem;
-      letter-spacing: 0.05em;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .roll-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(160,122,255,0.3); }
-    .roll-btn:active { transform: translateY(0); }
-    .roll-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    /* Active modifier pills */
-    .modifier-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .mod-pill {
-      padding: 4px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(245,200,66,0.3);
-      background: rgba(245,200,66,0.07);
-      font-size: 0.78rem;
-      color: var(--gold);
-    }
-
-    /* Roll result reveal */
-    .roll-result {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      animation: result-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .roll-result.visible { display: flex; }
-    @keyframes result-pop {
-      from { opacity: 0; transform: scale(0.6); }
-      to   { opacity: 1; transform: scale(1); }
-    }
-
-    .result-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 28px 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      min-width: 200px;
-      position: relative;
-    }
-    .result-sprite { font-size: 72px; }
-    .result-name { font-size: 1.4rem; font-weight: 600; }
-    .result-rarity { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; }
-
-    .result-stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      width: 100%;
-      margin-top: 8px;
-    }
-    .stat-box {
-      background: var(--surface2);
-      border-radius: 8px;
-      padding: 6px 4px;
-      text-align: center;
-    }
-    .stat-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
-    .stat-val { font-size: 0.95rem; font-weight: 600; color: var(--text); }
-
-    .btn-keep, .btn-crush-result {
-      padding: 10px 28px;
-      border-radius: 8px;
-      font-family: 'Crimson Pro', serif;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-keep {
-      background: linear-gradient(135deg, var(--accent), #7a5aff);
-      border: none;
-      color: #fff;
-    }
-    .btn-crush-result {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-    .btn-crush-result:hover { border-color: var(--accent2); color: var(--accent2); }
-
-    /* ── SHOP PAGE ── */
-    .shop-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 14px;
-    }
-
-    .shop-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.15s;
-    }
-    .shop-card:hover { border-color: var(--border2); }
-
-    .shop-icon { font-size: 40px; }
-    .shop-item-name { font-size: 0.95rem; font-weight: 600; text-align: center; }
-    .shop-item-desc { font-size: 0.78rem; color: var(--muted); text-align: center; font-style: italic; line-height: 1.4; }
-    .shop-price {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.85rem;
-      color: var(--gold);
-      font-weight: 600;
-    }
-
-    .btn-buy {
-      width: 100%;
-      padding: 8px;
-      background: rgba(160,122,255,0.1);
-      border: 1px solid var(--border2);
-      border-radius: 7px;
-      color: var(--accent);
-      font-family: 'Crimson Pro', serif;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-buy:hover { background: rgba(160,122,255,0.2); }
-
-    /* ── DETAIL MODAL ── */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(10,10,15,0.85);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(4px);
-    }
-    .modal-overlay.open { display: flex; }
-
-    .modal {
-      background: var(--surface);
-      border: 1px solid var(--border2);
-      border-radius: 20px;
-      padding: 32px;
-      width: 420px;
-      max-width: 95vw;
-      max-height: 90vh;
-      overflow-y: auto;
-      animation: modal-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      position: relative;
-    }
-    @keyframes modal-in {
-      from { opacity: 0; transform: scale(0.9) translateY(20px); }
-      to   { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 16px; right: 16px;
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 1.2rem;
-      cursor: pointer;
-      width: 28px; height: 28px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-      transition: all 0.15s;
-    }
-    .modal-close:hover { background: var(--surface2); color: var(--text); }
-
-    .modal-sprite { font-size: 80px; text-align: center; margin-bottom: 8px; }
-    .modal-name { font-size: 1.6rem; font-weight: 600; text-align: center; }
-    .modal-meta { display: flex; gap: 8px; justify-content: center; margin: 8px 0 20px; flex-wrap: wrap; }
-
-    .modal-stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .modal-xp {
-      margin-bottom: 20px;
-    }
-    .modal-xp-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .modal-xp-bar {
-      height: 6px;
-      background: var(--surface2);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .modal-xp-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 999px; }
-
-    .modal-actions { display: flex; gap: 10px; }
-
-    .btn-modal-primary {
-      flex: 1;
-      padding: 10px;
-      background: linear-gradient(135deg, var(--accent), #7a5aff);
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      font-family: 'Crimson Pro', serif;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: opacity 0.15s;
-    }
-    .btn-modal-primary:hover { opacity: 0.85; }
-
-    .btn-modal-danger {
-      flex: 1;
-      padding: 10px;
-      background: none;
-      border: 1px solid rgba(255,100,100,0.3);
-      border-radius: 8px;
-      color: #ff8080;
-      font-family: 'Crimson Pro', serif;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-modal-danger:hover { background: rgba(255,100,100,0.1); }
-
-    /* Pet section in modal */
-    .modal-section-label {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      margin-bottom: 10px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-    }
-
-    .pet-slot {
-      background: var(--surface2);
-      border: 1px dashed var(--border);
-      border-radius: 10px;
-      padding: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      transition: all 0.15s;
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-    .pet-slot:hover { border-color: var(--accent); color: var(--accent); }
-    .pet-slot.assigned { border-style: solid; border-color: var(--border2); color: var(--text); }
-
-    /* ── BATTLE PAGE ── */
-    .battle-arena {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: 24px;
-      align-items: center;
-      margin-bottom: 32px;
-    }
-
-    .fighter {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-    .fighter.active { border-color: var(--accent); box-shadow: 0 0 20px rgba(160,122,255,0.1); }
-
-    .fighter-sprite { font-size: 64px; }
-    .fighter-name { font-size: 1rem; font-weight: 600; }
-    .hp-bar-wrap {
-      width: 100%;
-      height: 8px;
-      background: var(--surface2);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .hp-bar { height: 100%; background: linear-gradient(90deg, #4aed7a, #4af0c8); border-radius: 999px; transition: width 0.5s; }
-    .hp-text { font-size: 0.78rem; color: var(--muted); }
-
-    .vs-badge {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 1.2rem;
-      color: var(--accent2);
-      text-align: center;
-    }
-
-    .battle-log {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      height: 160px;
-      overflow-y: auto;
-      font-size: 0.85rem;
-      line-height: 1.8;
-      margin-bottom: 16px;
-    }
-    .log-line { color: var(--muted); }
-    .log-line.highlight { color: var(--text); }
-    .log-line.damage { color: var(--accent2); }
-    .log-line.win { color: var(--gold); font-style: italic; }
-
-    .battle-actions { display: flex; gap: 10px; }
-
-    .btn-battle {
-      flex: 1;
-      padding: 12px;
-      background: none;
-      border: 1px solid var(--border2);
-      border-radius: 8px;
-      color: var(--text);
-      font-family: 'Crimson Pro', serif;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-battle:hover { background: var(--surface2); }
-    .btn-battle.primary { background: rgba(160,122,255,0.1); border-color: var(--accent); color: var(--accent); }
-    .btn-battle.primary:hover { background: rgba(160,122,255,0.2); }
-
-    /* ── PROFILE PAGE ── */
-    .profile-grid {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 20px;
-    }
-
-    .profile-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 28px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      height: fit-content;
-    }
-
-    .avatar {
-      width: 80px; height: 80px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      cursor: pointer;
-    }
-
-    .profile-username { font-size: 1.3rem; font-weight: 600; }
-    .profile-since { font-size: 0.8rem; color: var(--muted); font-style: italic; }
-
-    .stat-row {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.9rem;
-    }
-    .stat-row:last-child { border-bottom: none; }
-    .stat-row .label { color: var(--muted); }
-    .stat-row .value { font-weight: 600; }
-
-    .profile-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .panel-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-    }
-    .panel-card-title {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 0.75rem;
-      color: var(--accent);
-      margin-bottom: 14px;
-    }
-
-    /* Toast notification */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      border-radius: 10px;
-      padding: 12px 24px;
-      font-size: 0.9rem;
-      color: var(--text);
-      opacity: 0;
-      transition: all 0.3s;
-      z-index: 999;
-      pointer-events: none;
-    }
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-    /* Responsive collapse sidebar */
-    @media (max-width: 768px) {
-      .app { grid-template-columns: 1fr; }
-      .sidebar {
-        position: fixed;
-        bottom: 0; left: 0; right: 0;
-        height: 60px;
-        flex-direction: row;
-        border-right: none;
-        border-top: 1px solid var(--border);
-        z-index: 50;
-      }
-      .sidebar-logo, .user-strip, .nav-section-label, .sidebar-footer { display: none; }
-      .nav { flex-direction: row; padding: 0; overflow-x: auto; justify-content: space-around; }
-      .nav-item { flex-direction: column; gap: 2px; padding: 8px 4px; font-size: 0.62rem; justify-content: center; align-items: center; }
-      .nav-item.active::before { display: none; }
-      .pages { padding: 16px; padding-bottom: 80px; }
-      .profile-grid, .battle-arena { grid-template-columns: 1fr; }
-      .showcase { grid-template-columns: repeat(3, 1fr); }
-    }
-  </style>
+  <!-- MAIN BUNDLE -->
+  <link rel="stylesheet" href="../../styles/app.css" />
 </head>
+
 <body>
 
 <div class="app">
-  <!-- ── SIDEBAR ── -->
+
+  <!-- SIDEBAR -->
   <aside class="sidebar">
+
     <div class="sidebar-logo">
       <h1>Monstrum</h1>
       <div class="tagline">Your realm awaits</div>
     </div>
 
-    <div class="user-strip">
-      <div class="user-name" id="nav-username">Adventurer</div>
-      <div class="currency-row">
-        <div class="currency-badge">🪙 <span class="val" id="nav-currency">0</span></div>
-        <div class="currency-badge">💎 <span class="val rare-val" id="nav-premium">0</span></div>
+    <div id="user-strip" class="user-strip">
+      <div class="user-details">
+        <div class="nav-username" id="nav-username">Adventurer</div>
+
+        <div class="currency-row">
+          <div class="currency-badge">💰 <span class="val" id="nav-currency">0</span></div>
+          <div class="currency-badge">💎 <span class="val rare-val" id="nav-premium">0</span></div>
+        </div>
       </div>
+
     </div>
 
     <nav class="nav">
+
       <div class="nav-section-label">Collect</div>
       <button class="nav-item active" data-page="collection">
-        <span class="nav-icon">📚</span> Collection
+        <span class="nav-icon">📖</span> Collection
       </button>
+
       <button class="nav-item" data-page="roll">
         <span class="nav-icon">🎲</span> Roll
       </button>
@@ -890,26 +51,36 @@
       <button class="nav-item" data-page="battle">
         <span class="nav-icon">⚔️</span> Battle
       </button>
+
       <button class="nav-item" data-page="areas">
-        <span class="nav-icon">🏕️</span> Areas
+        <span class="nav-icon">🏝️</span> Areas
       </button>
 
       <div class="nav-section-label">Account</div>
       <button class="nav-item" data-page="shop">
         <span class="nav-icon">🛒</span> Shop
       </button>
+
       <button class="nav-item" data-page="profile">
         <span class="nav-icon">👤</span> Profile
       </button>
+
+      <div class="nav-section-label">Developer</div>
+      <button class="nav-item" data-page="devtools">
+        <span class="nav-icon">🛠️</span> Dev Tools
+      </button>
+
     </nav>
 
     <div class="sidebar-footer">
       <button class="btn-logout" id="logout-btn">Sign Out</button>
     </div>
+
   </aside>
 
-  <!-- ── MAIN ── -->
+  <!-- MAIN -->
   <main class="main">
+
     <div class="topbar">
       <div class="topbar-title" id="page-title">Collection</div>
       <div class="topbar-meta" id="page-meta">Your captured creatures</div>
@@ -917,920 +88,484 @@
 
     <div class="pages">
 
-      <!-- ══ COLLECTION PAGE ══ -->
+      <!-- COLLECTION -->
       <div id="page-collection" class="page active">
-        <!-- Showcase top 3 -->
+
         <div class="section-header">
           <div class="section-title">Showcase</div>
           <div class="section-count">Top 3 display slots</div>
         </div>
+
         <div class="showcase" id="showcase-slots">
           <div class="showcase-slot empty rank-1" data-slot="1">
             <div class="rank">#1</div>
-            <div style="color:var(--muted);font-size:0.85rem;font-style:italic;">Empty slot</div>
+            <div class="empty-text">Empty slot</div>
           </div>
+
           <div class="showcase-slot empty rank-2" data-slot="2">
             <div class="rank">#2</div>
-            <div style="color:var(--muted);font-size:0.85rem;font-style:italic;">Empty slot</div>
+            <div class="empty-text">Empty slot</div>
           </div>
+
           <div class="showcase-slot empty rank-3" data-slot="3">
             <div class="rank">#3</div>
-            <div style="color:var(--muted);font-size:0.85rem;font-style:italic;">Empty slot</div>
+            <div class="empty-text">Empty slot</div>
           </div>
         </div>
 
-        <!-- Full collection -->
-        <div class="section-header" style="margin-top:24px;">
+        <div class="section-header">
           <div class="section-title">Your Collection</div>
           <div class="section-count" id="collection-count">0 creatures</div>
         </div>
+
         <div class="collection-grid" id="collection-grid">
           <div class="empty-state">
-            <div class="empty-icon">🌀</div>
+            <div class="empty-icon"></div>
             <div>No creatures yet. Head to Roll to begin your journey!</div>
           </div>
         </div>
+
       </div>
 
-      <!-- ══ ROLL PAGE ══ -->
+      <!-- ROLL -->
       <div id="page-roll" class="page">
+
         <div class="roll-center">
-          <div style="text-align:center;color:var(--muted);font-style:italic;font-size:1rem;">
+
+          <div class="roll-hint center-muted">
             Touch the portal to summon a creature from the void
           </div>
 
-          <!-- Active modifier display -->
-          <div class="modifier-row" id="active-modifiers">
-            <!-- populated by JS if modifiers active -->
-          </div>
+          <div class="modifier-row" id="active-modifiers"></div>
 
           <div class="roll-portal" id="roll-portal">
             <div class="roll-ring"></div>
-            <div class="roll-orb" id="roll-orb">🌀</div>
+            <div id="roll-orb" class="roll-orb">🌀</div>
           </div>
 
           <button class="roll-btn" id="roll-btn">Summon</button>
 
-          <!-- Result (hidden until roll) -->
           <div class="roll-result" id="roll-result">
+
             <div class="result-card" id="result-card">
               <div class="result-sprite" id="result-sprite"></div>
               <div class="result-name" id="result-name"></div>
               <div class="result-rarity" id="result-rarity"></div>
               <div class="result-stats" id="result-stats"></div>
             </div>
-            <div style="display:flex;gap:10px;">
+
+            <div class="result-actions">
               <button class="btn-keep" id="btn-keep">Keep</button>
               <button class="btn-crush-result" id="btn-crush-now">Crush for XP</button>
             </div>
+
           </div>
 
-          <div style="font-size:0.8rem;color:var(--muted);text-align:center;">
-            Rolls remaining today: <span id="rolls-remaining" style="color:var(--accent);">10</span>
-            &nbsp;·&nbsp; Use modifiers from the Shop to boost your odds
+          <div class="roll-footer muted-text">
+            Rolls remaining today:
+            <span class="accent-text" id="rolls-remaining">10</span>
+            · Use modifiers from Shop
           </div>
+
         </div>
       </div>
 
-      <!-- ══ BATTLE PAGE ══ -->
+      <!-- BATTLE -->
       <div id="page-battle" class="page">
-        <div class="battle-arena" id="battle-arena">
-          <!-- Your fighter -->
+
+        <div class="battle-arena">
+
           <div class="fighter active" id="fighter-you">
-            <div class="fighter-sprite">❓</div>
+            <div class="fighter-sprite">⚔️</div>
             <div class="fighter-name">Choose a fighter</div>
-            <div class="hp-bar-wrap"><div class="hp-bar" style="width:100%"></div></div>
+            <div class="hp-bar-wrap"><div class="hp-bar"></div></div>
             <div class="hp-text">— / —</div>
           </div>
 
           <div class="vs-badge">VS</div>
 
-          <!-- Opponent -->
           <div class="fighter" id="fighter-opp">
             <div class="fighter-sprite">🌫️</div>
             <div class="fighter-name">Awaiting...</div>
-            <div class="hp-bar-wrap"><div class="hp-bar" style="width:100%"></div></div>
+            <div class="hp-bar-wrap"><div class="hp-bar"></div></div>
             <div class="hp-text">— / —</div>
           </div>
+
         </div>
 
-        <div class="battle-log" id="battle-log">
-          <div class="log-line">Select your creature and find an opponent to begin battle.</div>
-        </div>
+        <div class="battle-log" id="battle-log"></div>
 
         <div class="battle-actions">
           <button class="btn-battle primary" id="btn-choose-fighter">Choose Fighter</button>
           <button class="btn-battle" id="btn-find-opponent">Find Opponent</button>
-          <button class="btn-battle" id="btn-attack" disabled>Attack!</button>
+          <button class="btn-battle" id="btn-attack" disabled>Attack</button>
         </div>
+
       </div>
 
-      <!-- ══ AREAS PAGE ══ -->
+      <!-- AREAS -->
       <div id="page-areas" class="page">
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;">
-          <div class="panel-card" style="opacity:0.5;text-align:center;padding:40px 20px;">
-            <div style="font-size:48px;margin-bottom:12px;">🏕️</div>
-            <div style="font-family:'Cinzel Decorative',serif;font-size:0.75rem;color:var(--accent);margin-bottom:8px;">Ancient Forest</div>
-            <div style="font-size:0.82rem;color:var(--muted);font-style:italic;">Assign creatures to farm resources. Coming soon.</div>
+
+        <div class="areas-grid">
+
+          <div class="panel-card areas-card locked">
+            <div class="areas-icon">🌵</div>
+            <div class="areas-title">Ancient Forest</div>
+            <div class="areas-desc">Coming soon.</div>
           </div>
-          <div class="panel-card" style="opacity:0.5;text-align:center;padding:40px 20px;">
-            <div style="font-size:48px;margin-bottom:12px;">🌋</div>
-            <div style="font-family:'Cinzel Decorative',serif;font-size:0.75rem;color:var(--accent);margin-bottom:8px;">Volcanic Rift</div>
-            <div style="font-size:0.82rem;color:var(--muted);font-style:italic;">Fire-type creatures yield bonus ore. Coming soon.</div>
+
+          <div class="panel-card areas-card locked">
+            <div class="areas-icon">🌋</div>
+            <div class="areas-title">Volcanic Rift</div>
+            <div class="areas-desc">Coming soon.</div>
           </div>
-          <div class="panel-card" style="opacity:0.5;text-align:center;padding:40px 20px;">
-            <div style="font-size:48px;margin-bottom:12px;">🌊</div>
-            <div style="font-family:'Cinzel Decorative',serif;font-size:0.75rem;color:var(--accent);margin-bottom:8px;">Abyssal Depths</div>
-            <div style="font-size:0.82rem;color:var(--muted);font-style:italic;">Water-type creatures harvest rare pearls. Coming soon.</div>
+
+          <div class="panel-card areas-card locked">
+            <div class="areas-icon">🌊</div>
+            <div class="areas-title">Abyssal Depths</div>
+            <div class="areas-desc">Coming soon.</div>
           </div>
+
         </div>
-        <div style="margin-top:24px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;text-align:center;font-size:0.9rem;color:var(--muted);font-style:italic;">
-          Areas unlock after you build your collection. Assign creatures to passively farm gold, items, and XP over time.
+
+        <div class="areas-footer">
+          Assign creatures to unlock passive farming systems.
         </div>
+
       </div>
 
-      <!-- ══ SHOP PAGE ══ -->
-      <div id="page-shop" class="page">
-        <div class="section-header"><div class="section-title">Modifiers</div></div>
-        <div class="shop-grid" style="margin-bottom:28px;">
+      <!-- SHOP -->
+       <div id="page-shop" class="page">
+
+        <div class="section-header">
+          <div class="section-title">Modifiers</div>
+        </div>
+
+        <div class="shop-grid shop-grid-spaced">
           <div class="shop-card">
             <div class="shop-icon">🔮</div>
             <div class="shop-item-name">Rare Focus</div>
             <div class="shop-item-desc">Doubles rare drop chance for 5 rolls</div>
-            <div class="shop-price">🪙 200</div>
-            <button class="btn-buy" onclick="showToast('Rare Focus purchased! Active for next 5 rolls.')">Buy</button>
+            <div class="shop-price">💰 200</div>
+            <button class="btn-buy"
+              onclick="showToast('Rare Focus purchased! Active for next 5 rolls.')">Buy</button>
           </div>
+
           <div class="shop-card">
-            <div class="shop-icon">⭐</div>
+            <div class="shop-icon">✨</div>
             <div class="shop-item-name">Legendary Aura</div>
             <div class="shop-item-desc">5% legendary chance for 3 rolls</div>
             <div class="shop-price">💎 50</div>
-            <button class="btn-buy" onclick="showToast('Legendary Aura activated!')">Buy</button>
+            <button class="btn-buy"
+              onclick="showToast('Legendary Aura activated!')">Buy</button>
           </div>
+
           <div class="shop-card">
             <div class="shop-icon">🔥</div>
             <div class="shop-item-name">Type Lens: Fire</div>
             <div class="shop-item-desc">Next roll guaranteed fire-type creature</div>
-            <div class="shop-price">🪙 150</div>
-            <button class="btn-buy" onclick="showToast('Fire Lens activated for your next roll!')">Buy</button>
+            <div class="shop-price">💰 150</div>
+            <button class="btn-buy"
+              onclick="showToast('Fire Lens activated for your next roll!')">Buy</button>
           </div>
         </div>
 
-        <div class="section-header"><div class="section-title">Pets</div></div>
-        <div class="shop-grid" style="margin-bottom:28px;">
+        <div class="section-header">
+          <div class="section-title">Pets</div>
+        </div>
+
+        <div class="shop-grid shop-grid-spaced">
           <div class="shop-card">
             <div class="shop-icon">🐱</div>
             <div class="shop-item-name">Spirit Kitten</div>
             <div class="shop-item-desc">+10% XP gain for assigned creature</div>
-            <div class="shop-price">🪙 300</div>
-            <button class="btn-buy" onclick="showToast('Spirit Kitten added to your pets!')">Buy</button>
+            <div class="shop-price">💰 300</div>
+            <button class="btn-buy"
+              onclick="showToast('Spirit Kitten added to your pets!')">Buy</button>
           </div>
+
           <div class="shop-card">
-            <div class="shop-icon">🐺</div>
+            <div class="shop-icon">🐸</div>
             <div class="shop-item-name">Shadow Pup</div>
             <div class="shop-item-desc">+8% ATK boost for assigned creature</div>
             <div class="shop-price">💎 30</div>
-            <button class="btn-buy" onclick="showToast('Shadow Pup added to your pets!')">Buy</button>
+            <button class="btn-buy"
+              onclick="showToast('Shadow Pup added to your pets!')">Buy</button>
           </div>
+
           <div class="shop-card">
             <div class="shop-icon">🦋</div>
             <div class="shop-item-name">Lunar Moth</div>
             <div class="shop-item-desc">+12% DEF boost for assigned creature</div>
-            <div class="shop-price">🪙 350</div>
-            <button class="btn-buy" onclick="showToast('Lunar Moth added to your pets!')">Buy</button>
+            <div class="shop-price">💰 350</div>
+            <button class="btn-buy"
+              onclick="showToast('Lunar Moth added to your pets!')">Buy</button>
           </div>
         </div>
 
-        <div class="section-header"><div class="section-title">Appearance</div></div>
+        <div class="section-header">
+          <div class="section-title">Appearance</div>
+        </div>
+
         <div class="shop-grid">
           <div class="shop-card">
             <div class="shop-icon">✨</div>
             <div class="shop-item-name">Golden Frame</div>
             <div class="shop-item-desc">Shimmering gold display border</div>
             <div class="shop-price">💎 20</div>
-            <button class="btn-buy" onclick="showToast('Golden Frame unlocked!')">Buy</button>
+            <button class="btn-buy"
+              onclick="showToast('Golden Frame unlocked!')">Buy</button>
           </div>
+
           <div class="shop-card">
             <div class="shop-icon">🌈</div>
             <div class="shop-item-name">Prismatic Skin</div>
             <div class="shop-item-desc">Rainbow colour shift effect</div>
             <div class="shop-price">💎 75</div>
-            <button class="btn-buy" onclick="showToast('Prismatic Skin unlocked!')">Buy</button>
+            <button class="btn-buy"
+              onclick="showToast('Prismatic Skin unlocked!')">Buy</button>
           </div>
         </div>
+
       </div>
 
-      <!-- ══ PROFILE PAGE ══ -->
+      <!-- PROFILE -->
       <div id="page-profile" class="page">
+
         <div class="profile-grid">
+
           <div class="profile-card">
-            <div class="avatar" title="Click to change avatar">🧙</div>
+            <div class="avatar" title="Click to change avatar">🧑</div>
             <div class="profile-username" id="profile-username">Adventurer</div>
             <div class="profile-since">Member since today</div>
 
-            <div style="width:100%">
-              <div class="stat-row"><span class="label">Creatures</span><span class="value" id="p-creatures">0</span></div>
-              <div class="stat-row"><span class="label">Battles Won</span><span class="value" id="p-wins">0</span></div>
-              <div class="stat-row"><span class="label">Rolls Made</span><span class="value" id="p-rolls">0</span></div>
-              <div class="stat-row"><span class="label">Gold</span><span class="value" style="color:var(--gold)" id="p-gold">0</span></div>
-              <div class="stat-row"><span class="label">Gems</span><span class="value" style="color:var(--rare)" id="p-gems">0</span></div>
+            <div class="profile-stats">
+              <div class="stat-row">
+                <span class="label">Creatures</span>
+                <span class="value" id="p-creatures">0</span>
+              </div>
+
+              <div class="stat-row">
+                <span class="label">Battles Won</span>
+                <span class="value" id="p-wins">0</span>
+              </div>
+
+              <div class="stat-row">
+                <span class="label">Rolls Made</span>
+                <span class="value" id="p-rolls">0</span>
+              </div>
+
+              <div class="stat-row">
+                <span class="label">Gold</span>
+                <span class="value gold" id="p-gold">0</span>
+              </div>
+
+              <div class="stat-row">
+                <span class="label">Gems</span>
+                <span class="value rare" id="p-gems">0</span>
+              </div>
             </div>
           </div>
 
           <div class="profile-panel">
+
             <div class="panel-card">
               <div class="panel-card-title">Achievements</div>
-              <div style="display:flex;flex-direction:column;gap:10px;">
-                <div style="display:flex;align-items:center;gap:12px;font-size:0.88rem;">
-                  <span style="font-size:1.4rem;">🥚</span>
+
+              <div class="achievement-list">
+
+                <div class="achievement">
+                  <span class="icon">🥚</span>
                   <div>
                     <div>First Summon</div>
-                    <div style="font-size:0.75rem;color:var(--muted);">Roll your first creature</div>
+                    <div class="muted">Roll your first creature</div>
                   </div>
-                  <div style="margin-left:auto;font-size:0.75rem;color:var(--muted);">0 / 1</div>
+                  <div class="progress">0 / 1</div>
                 </div>
-                <div style="display:flex;align-items:center;gap:12px;font-size:0.88rem;opacity:0.5;">
-                  <span style="font-size:1.4rem;">⚔️</span>
+
+                <div class="achievement locked">
+                  <span class="icon">⚔️</span>
                   <div>
                     <div>First Blood</div>
-                    <div style="font-size:0.75rem;color:var(--muted);">Win your first battle</div>
+                    <div class="muted">Win your first battle</div>
                   </div>
-                  <div style="margin-left:auto;font-size:0.75rem;color:var(--muted);">0 / 1</div>
+                  <div class="progress">0 / 1</div>
                 </div>
-                <div style="display:flex;align-items:center;gap:12px;font-size:0.88rem;opacity:0.5;">
-                  <span style="font-size:1.4rem;">🌟</span>
+
+                <div class="achievement locked">
+                  <span class="icon">🌟</span>
                   <div>
                     <div>Legendary Hunter</div>
-                    <div style="font-size:0.75rem;color:var(--muted);">Obtain a Legendary creature</div>
+                    <div class="muted">Obtain a Legendary creature</div>
                   </div>
-                  <div style="margin-left:auto;font-size:0.75rem;color:var(--muted);">0 / 1</div>
+                  <div class="progress">0 / 1</div>
                 </div>
+
               </div>
             </div>
 
             <div class="panel-card">
               <div class="panel-card-title">Settings</div>
-              <div style="display:flex;flex-direction:column;gap:12px;font-size:0.9rem;">
-                <div style="display:flex;justify-content:space-between;align-items:center;">
-                  <span style="color:var(--muted);">Email notifications</span>
-                  <span style="color:var(--accent);">Coming soon</span>
+
+              <div class="settings-list">
+
+                <div class="setting-row">
+                  <span>Email notifications</span>
+                  <span class="muted-accent">Coming soon</span>
                 </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;">
-                  <span style="color:var(--muted);">Change username</span>
-                  <span style="color:var(--accent);">Coming soon</span>
+
+                <div class="setting-row">
+                  <span>Change username</span>
+                  <span class="muted-accent">Coming soon</span>
                 </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);">
-                  <span style="color:#ff8080;">Delete account</span>
-                  <button style="background:none;border:1px solid rgba(255,100,100,0.3);border-radius:6px;padding:4px 12px;color:#ff8080;font-family:'Crimson Pro',serif;font-size:0.82rem;cursor:pointer;" onclick="showToast('Feature coming soon.')">Request</button>
+
+                <div class="setting-row danger">
+                  <button class="btn-modal-danger"
+                    onclick="showToast('Feature coming soon.')">Delete Account</button>
                 </div>
+
               </div>
+
             </div>
+
           </div>
         </div>
       </div>
 
-    </div><!-- /pages -->
-  </main>
-</div><!-- /app -->
+      <div id="page-devtools" class="page">
 
-<!-- ── CREATURE DETAIL MODAL ── -->
+        <div class="profile-grid">
+
+          <div class="profile-card">
+            <div class="profile-username">Dev Tools</div>
+            <div class="muted-text">
+              Adjust test profile values and creature stats for debugging.
+            </div>
+          </div>
+
+          <div class="profile-panel">
+
+            <div class="panel-card">
+              <div class="panel-card-title">Profile overrides</div>
+
+              <div class="dev-tools-grid">
+
+                <label class="dev-input-row">
+                  <span>Gold</span>
+                  <input id="dev-gold" class="dev-input"type="number" min="0">
+                </label>
+
+                <label class="dev-input-row">
+                  <span>Gems</span>
+                  <input id="dev-gems" class="dev-input" type="number" min="0">
+                </label>
+
+                <label class="dev-input-row">
+                  <span>Rolls today</span>
+                  <input id="dev-rolls" class="dev-input" type="number" min="0">
+                </label>
+
+                <label class="dev-input-row">
+                  <span>Battles won</span>
+                  <input id="dev-wins" class="dev-input" type="number" min="0">
+                </label>
+
+                <label class="dev-input-row">
+                  <span>Total rolls</span>
+                  <input id="dev-total-rolls" class="dev-input" type="number" min="0">
+                </label>
+
+              </div>
+
+              <div class="dev-actions">
+                <button class="btn-modal-primary" id="dev-save-profile">Save profile</button>
+                <button class="btn-modal-danger" id="dev-reset-profile">Reset</button>
+              </div>
+
+            </div>
+
+            <div class="panel-card">
+              <div class="panel-card-title">Creature stat editor</div>
+
+              <div class="dev-tools-grid">
+
+                <label class="dev-input-row">
+                  <span>Creature</span>
+                  <select id="dev-creature-select" class="dev-input"></select>
+                </label>
+
+                <label class="dev-input-row">
+                  <span>HP</span>
+                  <input id="dev-creature-hp" class="dev-input" type="number" min="1">
+                </label>
+
+                <label class="dev-input-row">
+                  <span>ATK</span>
+                  <input id="dev-creature-atk" class="dev-input" type="number" min="0">
+                </label>
+
+                <label class="dev-input-row">
+                  <span>SPD</span>
+                  <input id="dev-creature-spd" class="dev-input" type="number" min="0">
+                </label>
+
+              </div>
+
+              <div class="dev-actions">
+                <button class="btn-modal-primary" id="dev-save-creature">
+                  Update creature
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL -->
 <div class="modal-overlay" id="creature-modal">
   <div class="modal">
-    <button class="modal-close" id="modal-close">✕</button>
+
+    <button class="modal-close" id="modal-close">✖</button>
+
     <div class="modal-sprite" id="m-sprite"></div>
     <div class="modal-name" id="m-name"></div>
     <div class="modal-meta" id="m-meta"></div>
+
     <div class="modal-stats" id="m-stats"></div>
+
     <div class="modal-xp">
       <div class="modal-xp-label">
         <span>XP Progress</span>
         <span id="m-xp-text">0 / 100</span>
       </div>
       <div class="modal-xp-bar">
-        <div class="modal-xp-fill" id="m-xp-fill" style="width:0%"></div>
+        <div class="modal-xp-fill" id="m-xp-fill"></div>
       </div>
     </div>
+
     <div class="modal-section-label">Pet Companion</div>
+
     <div class="pet-slot" id="m-pet-slot">
-      <span style="font-size:1.2rem">🐾</span>
-      <span>Assign a pet companion</span>
+      <span>🐾 Assign a pet</span>
     </div>
-    <div class="modal-section-label" style="margin-top:16px;border-top:none;padding-top:0;"></div>
+
     <div class="modal-actions">
-      <button class="btn-modal-primary" id="m-btn-showcase">Pin to Showcase</button>
-      <button class="btn-modal-danger" id="m-btn-crush">Crush for XP</button>
+      <button class="btn-modal-primary" id="m-btn-showcase">Pin</button>
+      <button class="btn-modal-danger" id="m-btn-crush">Crush</button>
     </div>
+
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<script type="module">
-  import { requireAuth, signOut, getUser } from './js/auth.js'
-  import { supabase } from './js/supabase.js'
+<script type="module" src="./js/pages/app.js"></script>
 
-  // ── AUTH GUARD ──
-  const session = await requireAuth()
-  const user = await getUser()
-
-  const RARITY_WEIGHTS = { common:60, uncommon:25, rare:12, legendary:3 }
-  const RARITY_XP     = { common:10,  uncommon:25, rare:60, legendary:200 }
-
-  // ── STATE ──
-  let CREATURE_TEMPLATES = []   // loaded from Supabase creatures table
-  let state = {
-    username:   'Adventurer',
-    currency:   100,
-    premium:    10,
-    collection: [],
-    showcase:   [],
-    rollsToday: 10,
-    totalRolls: 0,
-    wins:       0,
-    pendingRoll: null,
-    profileId:  null,
-  }
-
-  // ── BOOTSTRAP: load everything from Supabase ──────────────
-  async function bootstrap() {
-    showLoading(true)
-    try {
-      await Promise.all([loadCreatureTemplates(), loadProfile(), loadUserCollection()])
-    } catch (err) {
-      console.error('Bootstrap error:', err)
-      // Fall through — UI still works with empty state
-    }
-    showLoading(false)
-    updateUI()
-  }
-
-  // 1. Load master creature list (public, no auth needed)
-  async function loadCreatureTemplates() {
-    const { data, error } = await supabase
-      .from('creatures')
-      .select('*')
-      .eq('evolution_stage', 1)   // only base forms for rolling
-      .order('rarity')
-    if (error) throw error
-    // Map sprite_url (emoji) → sprite field for UI compatibility
-    CREATURE_TEMPLATES = (data || []).map(c => ({
-      ...c,
-      sprite: c.sprite_url,
-    }))
-  }
-
-  // 2. Load user profile (currency, username)
-  async function loadProfile() {
-    if (!user) return
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single()
-    if (error) return
-    state.profileId  = data.id
-    state.username   = data.username || user.email?.split('@')[0] || 'Adventurer'
-    state.currency   = data.currency ?? 100
-    state.premium    = data.premium_currency ?? 10
-  }
-
-  // 3. Load user's creature collection
-  async function loadUserCollection() {
-    if (!user) return
-    const { data, error } = await supabase
-      .from('user_creatures')
-      .select(`
-        id, nickname, level, xp, hp, atk, def, spd,
-        is_displayed, display_order,
-        creatures ( id, name, type, rarity, sprite_url, base_hp, base_atk, base_def, base_spd, evolves_at_xp )
-      `)
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-    if (error) throw error
-
-    state.collection = (data || []).map(uc => ({
-      _id:          uc.id,                        // user_creatures row id
-      id:           uc.creatures.id,              // creature template id
-      name:         uc.creatures.name,
-      type:         uc.creatures.type,
-      rarity:       uc.creatures.rarity,
-      sprite:       uc.creatures.sprite_url,
-      base_hp:      uc.hp   ?? uc.creatures.base_hp,
-      base_atk:     uc.atk  ?? uc.creatures.base_atk,
-      base_def:     uc.def  ?? uc.creatures.base_def,
-      base_spd:     uc.spd  ?? uc.creatures.base_spd,
-      evolves_at_xp:uc.creatures.evolves_at_xp,
-      nickname:     uc.nickname,
-      level:        uc.level,
-      xp:           uc.xp,
-      showcased:    uc.is_displayed,
-      showcaseSlot: uc.display_order,
-    }))
-  }
-
-  // ── PERSIST TO SUPABASE ───────────────────────────────────
-
-  // Save a kept creature to user_creatures table
-  async function persistKeptCreature(creature) {
-    if (!user) return null
-    const { data, error } = await supabase
-      .from('user_creatures')
-      .insert({
-        user_id:     user.id,
-        creature_id: creature.id,
-        level:       1,
-        xp:          0,
-        hp:          creature.base_hp,
-        atk:         creature.base_atk,
-        def:         creature.base_def,
-        spd:         creature.base_spd,
-      })
-      .select('id')
-      .single()
-    if (error) { console.error('Save creature error:', error); return null }
-    return data.id   // returns the user_creatures row id
-  }
-
-  // Delete a crushed creature and optionally add XP to another
-  async function persistCrush(userCreatureId, targetId, xpGain) {
-    if (!user) return
-    // Delete crushed row
-    await supabase.from('user_creatures').delete().eq('id', userCreatureId)
-    // Add XP to target
-    if (targetId) {
-      const { data: t } = await supabase
-        .from('user_creatures').select('xp').eq('id', targetId).single()
-      if (t) {
-        await supabase.from('user_creatures')
-          .update({ xp: t.xp + xpGain })
-          .eq('id', targetId)
-      }
-    }
-  }
-
-  // Update showcase pins
-  async function persistShowcase() {
-    if (!user) return
-    // Clear all display flags for this user
-    await supabase
-      .from('user_creatures')
-      .update({ is_displayed: false, display_order: null })
-      .eq('user_id', user.id)
-    // Set new showcase
-    for (const c of state.collection.filter(x => x.showcased)) {
-      if (!c._id) continue
-      await supabase
-        .from('user_creatures')
-        .update({ is_displayed: true, display_order: c.showcaseSlot })
-        .eq('id', c._id)
-    }
-  }
-
-  // Update profile currency
-  async function persistCurrency() {
-    if (!user) return
-    await supabase
-      .from('profiles')
-      .update({ currency: state.currency, premium_currency: state.premium })
-      .eq('id', user.id)
-  }
-
-  // Persist XP / level changes to a creature
-  async function persistCreatureXP(creature) {
-    if (!user || !creature._id) return
-    await supabase
-      .from('user_creatures')
-      .update({ xp: creature.xp, level: creature.level, hp: creature.base_hp, atk: creature.base_atk, def: creature.base_def, spd: creature.base_spd })
-      .eq('id', creature._id)
-  }
-
-  // Loading overlay
-  function showLoading(on) {
-    let el = document.getElementById('loading-overlay')
-    if (!el) {
-      el = document.createElement('div')
-      el.id = 'loading-overlay'
-      el.style.cssText = 'position:fixed;inset:0;background:rgba(10,10,15,0.8);z-index:200;display:flex;align-items:center;justify-content:center;font-family:"Cinzel Decorative",serif;font-size:1rem;color:#a07aff;letter-spacing:0.1em;'
-      el.textContent = 'Loading your realm...'
-      document.body.appendChild(el)
-    }
-    el.style.display = on ? 'flex' : 'none'
-  }
-
-  // Fallback: if Supabase not configured, use localStorage
-  function saveState() {
-    try { localStorage.setItem('monstrum_state_backup', JSON.stringify({ currency: state.currency, premium: state.premium, rollsToday: state.rollsToday, totalRolls: state.totalRolls, wins: state.wins })) } catch(e) {}
-  }
-
-  // ── UI HELPERS ──
-  function showToast(msg, duration=2800) {
-    const t = document.getElementById('toast')
-    t.textContent = msg
-    t.classList.add('show')
-    setTimeout(() => t.classList.remove('show'), duration)
-  }
-  window.showToast = showToast
-
-  function rarityColor(r) {
-    return { legendary:'var(--gold)', rare:'var(--rare)', uncommon:'var(--accent)', common:'var(--muted)' }[r] || 'var(--muted)'
-  }
-
-  function statBox(label, val) {
-    return `<div class="stat-box"><div class="stat-label">${label}</div><div class="stat-val">${val}</div></div>`
-  }
-
-  // ── UPDATE NAV/HEADER ──
-  function updateUI() {
-    document.getElementById('nav-username').textContent = state.username
-    document.getElementById('nav-currency').textContent = state.currency
-    document.getElementById('nav-premium').textContent = state.premium
-    document.getElementById('profile-username').textContent = state.username
-    document.getElementById('p-creatures').textContent = state.collection.length
-    document.getElementById('p-wins').textContent = state.wins
-    document.getElementById('p-rolls').textContent = state.totalRolls
-    document.getElementById('p-gold').textContent = state.currency
-    document.getElementById('p-gems').textContent = state.premium
-    document.getElementById('rolls-remaining').textContent = state.rollsToday
-    renderCollection()
-    renderShowcase()
-  }
-
-  // ── RENDER COLLECTION GRID ──
-  function renderCollection() {
-    const grid = document.getElementById('collection-grid')
-    document.getElementById('collection-count').textContent = `${state.collection.length} creature${state.collection.length !== 1 ? 's' : ''}`
-
-    if (state.collection.length === 0) {
-      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🌀</div><div>No creatures yet. Head to Roll to begin your journey!</div></div>`
-      return
-    }
-
-    grid.innerHTML = state.collection.map((uc, i) => {
-      const xpPct = Math.min(100, Math.round((uc.xp / uc.evolves_at_xp) * 100))
-      return `
-        <div class="creature-card rarity-${uc.rarity}" data-idx="${i}" onclick="openCreatureModal(${i})">
-          <div class="card-sprite">${uc.sprite}</div>
-          <div class="card-name">${uc.nickname || uc.name}</div>
-          <div class="card-type">${uc.type}</div>
-          <div class="rarity-badge">${uc.rarity}</div>
-          <div class="card-level">Lv ${uc.level}</div>
-          <div class="xp-bar-wrap"><div class="xp-bar" style="width:${xpPct}%"></div></div>
-        </div>`
-    }).join('')
-  }
-
-  // ── RENDER SHOWCASE ──
-  function renderShowcase() {
-    const slots = document.getElementById('showcase-slots')
-    const showcased = state.collection.filter(c => c.showcased)
-    const rankClass = ['rank-1','rank-2','rank-3']
-
-    slots.innerHTML = [1,2,3].map(rank => {
-      const c = showcased.find(x => x.showcaseSlot === rank)
-      if (c) {
-        return `<div class="showcase-slot ${rankClass[rank-1]}" onclick="openCreatureModal(${state.collection.indexOf(c)})">
-          <div class="rank">#${rank}</div>
-          <div class="showcase-sprite">${c.sprite}</div>
-          <div class="showcase-name">${c.nickname || c.name}</div>
-          <div class="showcase-type">${c.type}</div>
-          <div class="showcase-level">Lv ${c.level}</div>
-        </div>`
-      } else {
-        return `<div class="showcase-slot empty ${rankClass[rank-1]}" data-slot="${rank}">
-          <div class="rank">#${rank}</div>
-          <div style="color:var(--muted);font-size:0.85rem;font-style:italic;">Empty slot</div>
-        </div>`
-      }
-    }).join('')
-  }
-
-  // ── ROLL LOGIC ──
-  function weightedRoll() {
-    const total = Object.values(RARITY_WEIGHTS).reduce((a,b) => a+b, 0)
-    let rand = Math.random() * total
-    for (const [rarity, weight] of Object.entries(RARITY_WEIGHTS)) {
-      rand -= weight
-      if (rand <= 0) return rarity
-    }
-    return 'common'
-  }
-
-  document.getElementById('roll-btn').addEventListener('click', doRoll)
-  document.getElementById('roll-portal').addEventListener('click', doRoll)
-
-  function doRoll() {
-    if (state.rollsToday <= 0) { showToast('No rolls remaining today!'); return }
-    if (state.pendingRoll) { showToast('Claim or crush your current roll first!'); return }
-
-    state.rollsToday--
-    state.totalRolls++
-
-    const rarity = weightedRoll()
-    const pool = CREATURE_TEMPLATES.filter(c => c.rarity === rarity)
-    const template = pool[Math.floor(Math.random() * pool.length)]
-
-    const portal = document.getElementById('roll-portal')
-    const orb = document.getElementById('roll-orb')
-
-    portal.classList.add('spinning')
-    orb.textContent = '✨'
-
-    setTimeout(() => {
-      portal.classList.remove('spinning')
-      orb.textContent = template.sprite
-
-      state.pendingRoll = {
-        ...template,
-        level: 1,
-        xp: 0,
-        showcased: false,
-        showcaseSlot: null,
-        rolledAt: Date.now()
-      }
-
-      showRollResult(state.pendingRoll)
-      updateUI()
-      saveState()
-    }, 650)
-  }
-
-  function showRollResult(creature) {
-    document.getElementById('result-sprite').textContent = creature.sprite
-    document.getElementById('result-name').textContent = creature.name
-    const rarEl = document.getElementById('result-rarity')
-    rarEl.textContent = creature.rarity.toUpperCase()
-    rarEl.style.color = rarityColor(creature.rarity)
-
-    document.getElementById('result-stats').innerHTML =
-      statBox('HP', creature.base_hp) +
-      statBox('ATK', creature.base_atk) +
-      statBox('DEF', creature.base_def) +
-      statBox('SPD', creature.base_spd)
-
-    document.getElementById('roll-result').classList.add('visible')
-  }
-
-  document.getElementById('btn-keep').addEventListener('click', async () => {
-    if (!state.pendingRoll) return
-    const btn = document.getElementById('btn-keep')
-    btn.disabled = true
-    btn.textContent = 'Saving...'
-
-    const newEntry = { ...state.pendingRoll }
-    const rowId = await persistKeptCreature(newEntry)
-    newEntry._id = rowId   // attach DB row id so future updates work
-
-    state.collection.push(newEntry)
-    state.pendingRoll = null
-    document.getElementById('roll-result').classList.remove('visible')
-    document.getElementById('roll-orb').textContent = '🌀'
-    btn.disabled = false
-    btn.textContent = 'Keep'
-    showToast('Creature added to your collection!')
-    updateUI()
-    saveState()
-  })
-
-  document.getElementById('btn-crush-now').addEventListener('click', async () => {
-    if (!state.pendingRoll) return
-    const xpGain = RARITY_XP[state.pendingRoll.rarity]
-    state.currency += Math.round(xpGain * 0.5)
-    state.pendingRoll = null
-    document.getElementById('roll-result').classList.remove('visible')
-    document.getElementById('roll-orb').textContent = '🌀'
-    showToast(`Crushed! Gained gold.`)
-    await persistCurrency()
-    updateUI()
-    saveState()
-  })
-
-  // ── CREATURE MODAL ──
-  let currentModalIdx = null
-
-  window.openCreatureModal = function(idx) {
-    currentModalIdx = idx
-    const c = state.collection[idx]
-    if (!c) return
-
-    document.getElementById('m-sprite').textContent = c.sprite
-    document.getElementById('m-name').textContent = c.nickname || c.name
-
-    const xpNeeded = c.evolves_at_xp || 100
-    const xpPct = Math.min(100, Math.round((c.xp / xpNeeded) * 100))
-
-    document.getElementById('m-meta').innerHTML =
-      `<span class="rarity-badge rarity-${c.rarity}" style="background:rgba(160,122,255,0.1);color:${rarityColor(c.rarity)};padding:3px 10px;border-radius:999px;font-size:0.75rem;text-transform:uppercase;">${c.rarity}</span>
-       <span style="font-size:0.82rem;color:var(--muted);">${c.type} · Lv ${c.level}</span>`
-
-    document.getElementById('m-stats').innerHTML =
-      statBox('HP', c.base_hp) + statBox('ATK', c.base_atk) + statBox('DEF', c.base_def) + statBox('SPD', c.base_spd)
-
-    document.getElementById('m-xp-text').textContent = `${c.xp} / ${xpNeeded}`
-    document.getElementById('m-xp-fill').style.width = xpPct + '%'
-
-    document.getElementById('m-pet-slot').innerHTML = c.pet
-      ? `<span style="font-size:1.2rem">${c.pet.sprite}</span><span>${c.pet.name} — ${c.pet.bonus}</span>`
-      : `<span style="font-size:1.2rem">🐾</span><span>Assign a pet companion</span>`
-
-    document.getElementById('creature-modal').classList.add('open')
-  }
-
-  document.getElementById('modal-close').addEventListener('click', () => {
-    document.getElementById('creature-modal').classList.remove('open')
-  })
-  document.getElementById('creature-modal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('creature-modal')) {
-      document.getElementById('creature-modal').classList.remove('open')
-    }
-  })
-
-  // Showcase pin
-  document.getElementById('m-btn-showcase').addEventListener('click', async () => {
-    if (currentModalIdx === null) return
-    const c = state.collection[currentModalIdx]
-
-    const usedSlots = state.collection.filter(x => x.showcased).map(x => x.showcaseSlot)
-    const freeSlot = [1,2,3].find(s => !usedSlots.includes(s))
-
-    if (c.showcased) {
-      c.showcased = false; c.showcaseSlot = null
-      showToast('Removed from showcase.')
-    } else if (freeSlot) {
-      c.showcased = true; c.showcaseSlot = freeSlot
-      showToast(`Pinned to showcase slot #${freeSlot}!`)
-    } else {
-      showToast('Showcase is full! Remove one first.')
-    }
-
-    document.getElementById('creature-modal').classList.remove('open')
-    updateUI()
-    await persistShowcase()
-    saveState()
-  })
-
-  // Crush from modal
-  document.getElementById('m-btn-crush').addEventListener('click', async () => {
-    if (currentModalIdx === null) return
-    const c = state.collection[currentModalIdx]
-    const xpGain = RARITY_XP[c.rarity] || 10
-    const crushedId = c._id
-
-    let targetId = null
-    const others = state.collection.filter((_, i) => i !== currentModalIdx)
-    if (others.length > 0) {
-      const target = others[Math.floor(Math.random() * others.length)]
-      target.xp = (target.xp || 0) + xpGain
-      targetId = target._id
-      checkEvolution(target)
-      await persistCreatureXP(target)
-      showToast(`Crushed ${c.name}! ${target.name} gained ${xpGain} XP.`)
-    } else {
-      state.currency += Math.round(xpGain * 0.5)
-      await persistCurrency()
-      showToast(`Crushed ${c.name} for gold!`)
-    }
-
-    state.collection.splice(currentModalIdx, 1)
-    await persistCrush(crushedId, targetId, xpGain)
-    document.getElementById('creature-modal').classList.remove('open')
-    updateUI()
-    saveState()
-  })
-
-  function checkEvolution(creature) {
-    if (creature.xp >= (creature.evolves_at_xp || 100)) {
-      creature.level++
-      creature.xp = 0
-      creature.base_hp = Math.round(creature.base_hp * 1.1)
-      creature.base_atk = Math.round(creature.base_atk * 1.1)
-      creature.base_def = Math.round(creature.base_def * 1.1)
-      creature.base_spd = Math.round(creature.base_spd * 1.05)
-      showToast(`✨ ${creature.name} leveled up to Lv ${creature.level}!`, 3500)
-    }
-  }
-
-  // ── BATTLE (simple prototype) ──
-  let battleState = { yourFighter: null, oppFighter: null, inBattle: false, yourHp: 0, oppHp: 0 }
-
-  document.getElementById('btn-choose-fighter').addEventListener('click', () => {
-    if (state.collection.length === 0) { showToast('You have no creatures! Roll some first.'); return }
-    const c = state.collection[Math.floor(Math.random() * state.collection.length)]
-    battleState.yourFighter = c
-    battleState.yourHp = c.base_hp
-
-    const f = document.getElementById('fighter-you')
-    f.querySelector('.fighter-sprite').textContent = c.sprite
-    f.querySelector('.fighter-name').textContent = c.nickname || c.name
-    f.querySelector('.hp-text').textContent = `${battleState.yourHp} / ${c.base_hp}`
-    f.querySelector('.hp-bar').style.width = '100%'
-
-    showToast(`${c.name} is ready to fight!`)
-  })
-
-  document.getElementById('btn-find-opponent').addEventListener('click', () => {
-    const template = CREATURE_TEMPLATES[Math.floor(Math.random() * CREATURE_TEMPLATES.length)]
-    battleState.oppFighter = { ...template }
-    battleState.oppHp = template.base_hp
-
-    const f = document.getElementById('fighter-opp')
-    f.querySelector('.fighter-sprite').textContent = template.sprite
-    f.querySelector('.fighter-name').textContent = template.name
-    f.querySelector('.hp-text').textContent = `${battleState.oppHp} / ${template.base_hp}`
-    f.querySelector('.hp-bar').style.width = '100%'
-
-    if (battleState.yourFighter) {
-      document.getElementById('btn-attack').disabled = false
-      battleState.inBattle = true
-      addLog('A wild ' + template.name + ' appeared! Battle begins!', 'highlight')
-    }
-  })
-
-  document.getElementById('btn-attack').addEventListener('click', () => {
-    if (!battleState.inBattle) return
-    const you = battleState.yourFighter
-    const opp = battleState.oppFighter
-
-    // Your attack
-    const yourDmg = Math.max(1, Math.round(you.base_atk - opp.base_def * 0.4 + (Math.random() * 10 - 5)))
-    battleState.oppHp = Math.max(0, battleState.oppHp - yourDmg)
-    addLog(`${you.name} attacks for ${yourDmg} damage!`, 'damage')
-    updateFighterHp('opp', battleState.oppHp, opp.base_hp)
-
-    if (battleState.oppHp <= 0) {
-      addLog(`${you.name} wins! Victory!`, 'win')
-      state.wins++
-      state.currency += 50
-      battleState.inBattle = false
-      document.getElementById('btn-attack').disabled = true
-      updateUI(); saveState()
-      return
-    }
-
-    // Opponent attacks back
-    setTimeout(() => {
-      const oppDmg = Math.max(1, Math.round(opp.base_atk - you.base_def * 0.4 + (Math.random() * 10 - 5)))
-      battleState.yourHp = Math.max(0, battleState.yourHp - oppDmg)
-      addLog(`${opp.name} retaliates for ${oppDmg} damage!`, 'damage')
-      updateFighterHp('you', battleState.yourHp, you.base_hp)
-
-      if (battleState.yourHp <= 0) {
-        addLog(`${you.name} was defeated...`, 'win')
-        battleState.inBattle = false
-        document.getElementById('btn-attack').disabled = true
-      }
-    }, 600)
-  })
-
-  function addLog(msg, cls='log-line') {
-    const log = document.getElementById('battle-log')
-    const line = document.createElement('div')
-    line.className = 'log-line ' + cls
-    line.textContent = msg
-    log.appendChild(line)
-    log.scrollTop = log.scrollHeight
-  }
-
-  function updateFighterHp(side, current, max) {
-    const f = document.getElementById('fighter-' + side)
-    const pct = Math.max(0, Math.round((current / max) * 100))
-    f.querySelector('.hp-bar').style.width = pct + '%'
-    f.querySelector('.hp-text').textContent = `${current} / ${max}`
-    if (pct < 30) f.querySelector('.hp-bar').style.background = 'linear-gradient(90deg,#ff6060,#ff9060)'
-  }
-
-  // ── NAV ──
-  const pageMeta = {
-    collection: 'Your captured creatures',
-    roll: 'Summon new creatures',
-    battle: 'Challenge others',
-    areas: 'Assign creatures to farm',
-    shop: 'Spend your gold & gems',
-    profile: 'Your account & stats',
-  }
-
-  document.querySelectorAll('.nav-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const pg = btn.dataset.page
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'))
-      btn.classList.add('active')
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
-      document.getElementById('page-' + pg).classList.add('active')
-      document.getElementById('page-title').textContent = pg.charAt(0).toUpperCase() + pg.slice(1)
-      document.getElementById('page-meta').textContent = pageMeta[pg] || ''
-    })
-  })
-
-  // ── LOGOUT ──
-  document.getElementById('logout-btn').addEventListener('click', async () => {
-    await signOut()
-  })
-
-  // ── INIT ──
-  if (user) {
-    state.username = user.user_metadata?.username || user.email?.split('@')[0] || 'Adventurer'
-  }
-  bootstrap()
-</script>
 </body>
 </html>

@@ -32,6 +32,8 @@ create table profiles (
   currency          integer not null default 100,
   premium_currency  integer not null default 10,
   rolls_today       integer not null default 10,
+  wins              integer not null default 0,
+  total_rolls       integer not null default 0,
   last_roll_date    date,
   created_at        timestamptz default now()
 );
@@ -182,6 +184,9 @@ alter table modifiers         enable row level security;
 alter table appearance_items  enable row level security;
 
 -- Profiles
+create policy "profiles_select_own" on profiles for select using (auth.uid() = id);
+create policy "profiles_update_own" on profiles for update using (auth.uid() = id);
+create policy "profiles_insert_own" on profiles for insert with check (auth.uid() = id);
 create policy "profiles_select_own" on profiles for select using (auth.uid() = id);
 create policy "profiles_update_own" on profiles for update using (auth.uid() = id);
 

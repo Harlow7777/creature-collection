@@ -1,0 +1,145 @@
+.btn-logout {
+    padding: 8px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+/* Roll Button */
+.roll-btn {
+    padding: 16px 48px;
+    background: linear-gradient(135deg, var(--accent), #7a5aff);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.roll-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(160, 122, 255, 0.3);
+}
+
+.roll-btn:active {
+    transform: translateY(0);
+}
+
+.roll-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Buy Button */
+.btn-buy {
+    width: 100%;
+    padding: 8px;
+    background: rgba(160, 122, 255, 0.1);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    color: var(--accent);
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-buy:hover {
+    background: rgba(160, 122, 255, 0.2);
+}
+
+/* Keep and Crush Buttons */
+.btn-keep,
+.btn-crush-result {
+    padding: 10px 28px;
+    border-radius: 8px;
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-keep {
+    background: linear-gradient(135deg, var(--accent), #7a5aff);
+    border: none;
+    color: #fff;
+}
+
+.btn-crush-result {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+}
+
+.btn-crush-result:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+}
+
+/* Modal button */
+.btn-modal-primary {
+    flex: 1;
+    padding: 10px;
+    background: linear-gradient(135deg, var(--accent), #7a5aff);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.btn-modal-primary:hover {
+    opacity: 0.85;
+}
+
+.btn-modal-danger {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: 1px solid rgba(255, 100, 100, 0.3);
+    border-radius: 8px;
+    color: #ff8080;
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-modal-danger:hover {
+    background: rgba(255, 100, 100, 0.1);
+}
+
+/* Battle button */
+.btn-battle {
+    flex: 1;
+    padding: 12px;
+    background: none;
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-battle:hover {
+    background: var(--surface2);
+}
+
+.btn-battle.primary {
+    background: rgba(160, 122, 255, 0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.btn-battle.primary:hover {
+    background: rgba(160, 122, 255, 0.2);
+}

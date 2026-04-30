@@ -1,0 +1,93 @@
+.battle-arena {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.fighter {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.fighter.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(160, 122, 255, 0.1);
+}
+
+.fighter-sprite {
+  font-size: 64px;
+}
+
+.fighter-name {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.hp-bar-wrap {
+  width: 100%;
+  height: 8px;
+  background: var(--surface2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.hp-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4aed7a, #4af0c8);
+  border-radius: 999px;
+  transition: width 0.5s;
+}
+
+.hp-text {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.vs-badge {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.2rem;
+  color: var(--accent2);
+  text-align: center;
+}
+
+.battle-log {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  height: 160px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.log-line {
+  color: var(--muted);
+}
+
+.log-line.highlight {
+  color: var(--text);
+}
+
+.log-line.damage {
+  color: var(--accent2);
+}
+
+.log-line.win {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.battle-actions {
+  display: flex;
+  gap: 10px;
+}

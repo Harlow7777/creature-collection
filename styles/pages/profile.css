@@ -1,0 +1,158 @@
+.profile-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+}
+
+.profile-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  height: fit-content;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.profile-username {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.profile-since {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.stat-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-row .label {
+  color: var(--muted);
+}
+
+.stat-row .value {
+  font-weight: 600;
+}
+
+.profile-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.panel-card-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.75rem;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+
+.achievement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.achievement {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.88rem;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: 0.2s ease;
+}
+
+.achievement .icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.achievement > div > div:first-child {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.achievement .muted {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.achievement .progress {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: 0.2s ease;
+}
+
+.setting-row > span:first-child {
+  color: var(--muted);
+}
+
+.setting-row .muted-accent {
+  color: var(--accent);
+  font-size: 0.85rem;
+}
+
+.setting-row.danger {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  background: rgba(255, 80, 80, 0.03);
+}
+
+.setting-row.danger > span:first-child {
+  color: #ff8080;
+}
