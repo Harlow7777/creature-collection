@@ -13,3 +13,111 @@
 
 .gap-8 { gap: 8px; }
 .gap-12 { gap: 12px; }
+/* ── GOLD REWARD POPUP ── */
+.user-strip {
+  position: relative;
+}
+
+.gold-popup {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-shadow: 0 0 12px rgba(245, 200, 66, 0.7);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 200;
+}
+
+.gold-popup.pop {
+  animation: gold-rise 1.6s ease-out forwards;
+}
+
+@keyframes gold-rise {
+  0%   { opacity: 0;   transform: translateX(-50%) translateY(0)     scale(0.7); }
+  15%  { opacity: 1;   transform: translateX(-50%) translateY(-8px)  scale(1.15); }
+  60%  { opacity: 1;   transform: translateX(-50%) translateY(-32px) scale(1); }
+  100% { opacity: 0;   transform: translateX(-50%) translateY(-56px) scale(0.9); }
+}
+
+/* ── XP REWARD POPUP ── */
+.xp-popup {
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  transform: translateX(-50%);
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow: 0 0 10px rgba(160, 122, 255, 0.7);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 50;
+  animation: xp-rise 1.5s ease-out forwards;
+}
+
+@keyframes xp-rise {
+  0%   { opacity: 0;   transform: translateX(-50%) translateY(0)     scale(0.7); }
+  15%  { opacity: 1;   transform: translateX(-50%) translateY(-8px)  scale(1.15); }
+  60%  { opacity: 1;   transform: translateX(-50%) translateY(-36px) scale(1); }
+  100% { opacity: 0;   transform: translateX(-50%) translateY(-60px) scale(0.85); }
+}
+
+/* ── CRUSH TARGET PICKER ── */
+.crush-target-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.crush-target-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+
+.crush-target-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+.crush-target-card.rarity-legendary::after { background: var(--gold); }
+.crush-target-card.rarity-rare::after      { background: var(--rare); }
+.crush-target-card.rarity-uncommon::after  { background: var(--accent); }
+.crush-target-card.rarity-common::after    { background: var(--muted); }
+
+.crush-target-card:hover {
+  border-color: var(--accent);
+  background: rgba(160, 122, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.crush-target-card.selected {
+  border-color: var(--accent);
+  background: rgba(160, 122, 255, 0.12);
+  box-shadow: 0 0 10px rgba(160, 122, 255, 0.2);
+}
+
+.crush-target-sprite { font-size: 28px; line-height: 1; }
+.crush-target-name   { font-size: 0.68rem; font-weight: 600; text-align: center; line-height: 1.2; }
+.crush-target-xp     { font-size: 0.6rem; color: var(--accent); }

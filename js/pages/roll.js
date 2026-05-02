@@ -3,7 +3,7 @@ import { statBox } from './collection.js'
 const RARITY_WEIGHTS = { common: 60, uncommon: 25, rare: 12, legendary: 3 }
 const RARITY_XP = { common: 10, uncommon: 25, rare: 60, legendary: 200 }
 
-export function initializeRollPage({ state, updateUI, persistProfile, persistKeptCreature, showToast, saveState, getCreatureTemplates, rarityColor }) {
+export function initializeRollPage({ state, updateUI, persistProfile, persistKeptCreature, showToast, showGoldPopup, saveState, getCreatureTemplates, rarityColor }) {
   document.getElementById('roll-btn').addEventListener('click', doRoll)
   document.getElementById('roll-portal').addEventListener('click', doRoll)
 
@@ -33,11 +33,12 @@ export function initializeRollPage({ state, updateUI, persistProfile, persistKep
   document.getElementById('btn-crush-now').addEventListener('click', async () => {
     if (!state.pendingRoll) return
     const xpGain = RARITY_XP[state.pendingRoll.rarity]
-    state.currency += Math.round(xpGain * 0.5)
+    const goldGain = Math.round(xpGain * 0.5)
+    state.currency += goldGain
     state.pendingRoll = null
     document.getElementById('roll-result').classList.remove('visible')
     document.getElementById('roll-orb').textContent = '🌀'
-    showToast('Crushed! Gained gold.')
+    showGoldPopup(goldGain)
     await persistProfile()
     updateUI()
     saveState()

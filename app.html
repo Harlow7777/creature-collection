@@ -31,6 +31,7 @@
         <div class="currency-row">
           <div class="currency-badge">💰 <span class="val" id="nav-currency">0</span></div>
           <div class="currency-badge">💎 <span class="val rare-val" id="nav-premium">0</span></div>
+          <div id="gold-popup" class="gold-popup" aria-hidden="true"></div>
         </div>
       </div>
 
@@ -222,7 +223,7 @@
 
         </div>
 
-
+        <div class="battle-log" id="battle-log"></div>
 
       </div>
 
@@ -259,6 +260,42 @@
 
       <!-- SHOP -->
        <div id="page-shop" class="page">
+
+        <div class="section-header">
+          <div class="section-title">Profile Pics</div>
+          <div class="section-count">Exclusive avatars</div>
+        </div>
+
+        <div class="shop-grid shop-grid-spaced" style="margin-bottom:28px;">
+          <div class="shop-card">
+            <div class="shop-icon">🐉</div>
+            <div class="shop-item-name">Elder Dragon</div>
+            <div class="shop-item-desc">Legendary profile avatar for true collectors</div>
+            <div class="shop-price">💎 80</div>
+            <button class="btn-buy" onclick="shopBuyAvatar('elder_dragon', 80)">Buy</button>
+          </div>
+          <div class="shop-card">
+            <div class="shop-icon">👑</div>
+            <div class="shop-item-name">Champion Crown</div>
+            <div class="shop-item-desc">For those who dominate the arena</div>
+            <div class="shop-price">💎 120</div>
+            <button class="btn-buy" onclick="shopBuyAvatar('champion_crown', 120)">Buy</button>
+          </div>
+          <div class="shop-card">
+            <div class="shop-icon">💀</div>
+            <div class="shop-item-name">Void Wraith</div>
+            <div class="shop-item-desc">Dark spectral avatar for shadow collectors</div>
+            <div class="shop-price">💎 200</div>
+            <button class="btn-buy" onclick="shopBuyAvatar('void_wraith', 200)">Buy</button>
+          </div>
+          <div class="shop-card">
+            <div class="shop-icon">🌙</div>
+            <div class="shop-item-name">Moon Sage</div>
+            <div class="shop-item-desc">Mystical lunar caster avatar</div>
+            <div class="shop-price">💎 60</div>
+            <button class="btn-buy" onclick="shopBuyAvatar('moon_sage', 60)">Buy</button>
+          </div>
+        </div>
 
         <div class="section-header">
           <div class="section-title">Modifiers</div>
@@ -358,7 +395,9 @@
         <div class="profile-grid">
 
           <div class="profile-card">
-            <div class="avatar" title="Click to change avatar">🧑</div>
+            <div class="avatar-wrap" id="avatar-wrap">
+              <div class="avatar" id="profile-avatar">🧑</div>
+            </div>
             <div class="profile-username" id="profile-username">Adventurer</div>
             <div class="profile-since">Member since today</div>
 
@@ -587,6 +626,37 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Crush target picker modal -->
+<div class="modal-overlay" id="crush-target-modal">
+  <div class="modal">
+    <button class="modal-close" id="crush-target-close">✖</button>
+    <div class="modal-name" style="margin-bottom:6px;">Send XP To...</div>
+    <div style="font-size:0.85rem;color:var(--muted);font-style:italic;text-align:center;margin-bottom:18px;">
+      Choose which creature receives the XP from crushing <strong id="crush-source-name"></strong>
+    </div>
+    <div class="crush-target-grid" id="crush-target-grid"></div>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn-modal-primary" id="crush-target-confirm" disabled>Confirm</button>
+      <button class="btn-modal-danger" id="crush-target-gold">Take Gold Instead</button>
+    </div>
+  </div>
+</div>
+
+<!-- Avatar picker modal -->
+<div class="modal-overlay" id="avatar-modal">
+  <div class="modal avatar-picker-modal">
+    <button class="modal-close" id="avatar-modal-close">✖</button>
+    <div class="modal-name" style="margin-bottom:4px;">Choose Profile Pic</div>
+    <div style="font-size:0.82rem;color:var(--muted);font-style:italic;text-align:center;margin-bottom:20px;">
+      Earn more by completing achievements, capturing creatures, and visiting the shop
+    </div>
+    <div id="avatar-picker-content"></div>
+    <div class="modal-actions" style="margin-top:20px;">
+      <button class="btn-modal-primary" id="avatar-confirm-btn" disabled>Set as Profile Pic</button>
+    </div>
+  </div>
+</div>
 
 <script type="module" src="./js/pages/app.js"></script>
 
