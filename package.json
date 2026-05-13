@@ -1,0 +1,29 @@
+{
+  "name": "creature-collection",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Harlow7777/creature-collection.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Harlow7777/creature-collection/issues"
+  },
+  "homepage": "https://github.com/Harlow7777/creature-collection#readme",
+  "devDependencies": {
+    "vite": "^8.0.12"
+  },
+  "dependencies": {
+    "grep": "^0.1.0"
+  }
+}
