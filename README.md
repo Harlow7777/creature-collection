@@ -26,63 +26,6 @@ A browser-based creature collection game. Roll for creatures, build your collect
 | Backend / Auth | [Supabase](https://supabase.com) (Postgres + Row Level Security) |
 | Hosting | GitHub Pages |
 
----
-
-## Project Structure
-
-```
-creature-collection/
-├── index.html                  # Landing / login page
-├── app.html                    # Main app shell (auth-protected)
-├── .env.example                # Environment variable template
-│
-├── js/
-│   ├── auth.js                 # Supabase auth helpers (signIn, signUp, requireAuth)
-│   ├── supabase.js             # Supabase client init via env vars
-│   ├── pages/
-│   │   ├── app.js              # Root module — state, bootstrap, all page wiring
-│   │   ├── collection.js       # renderCollection, renderShowcase, statBox
-│   │   ├── roll.js             # Roll page logic, weighted pulls, keep/crush handlers
-│   │   ├── battle.js           # Battle engine — fighter select, attack, end-battle flow
-│   │   └── devtools.js         # Dev tools page render and apply handlers
-│   └── utils/
-│       ├── api.js              # Supabase query helpers (getUserCreatures, persistCrush, etc.)
-│       └── rarity.js           # rarityColor() utility
-│
-├── styles/
-│   ├── app.css                 # Root CSS import file
-│   ├── core/
-│   │   ├── variables.css       # CSS custom properties (colours, spacing, nav width)
-│   │   └── reset.css           # Box-sizing reset and base body styles
-│   ├── layout/
-│   │   └── app-layout.css      # .app grid, .main flex column, scrollable .pages
-│   ├── sidebar/
-│   │   └── sidebar.css         # Sidebar nav, user strip, currency badges
-│   ├── components/
-│   │   ├── buttons.css         # Button variants
-│   │   ├── cards.css           # Shared card styles
-│   │   ├── modal.css           # Modal overlay and panel
-│   │   └── toast.css           # Toast notification
-│   ├── pages/
-│   │   ├── collection.css      # Collection grid, showcase slots
-│   │   ├── roll.css            # Roll portal, result card
-│   │   ├── battle.css          # Arena layout, fighter panels, fighter-select grid, damage floats
-│   │   ├── shop.css            # Shop grid and cards
-│   │   ├── profile.css         # Profile card, avatar wrap, avatar picker modal
-│   │   ├── areas.css           # Areas page (placeholder)
-│   │   └── devtools.css        # Dev tools page
-│   └── utilities/
-│       └── helpers.css         # Gold popup, XP popup, crush target picker
-│
-├── assets/
-│   └── creatures/              # Creature sprite images (.png)
-│
-└── data/
-    └── schema_and_seed.sql     # Full Supabase schema + seed data (run once)
-```
-
----
-
 ## Local Development
 
 ### Prerequisites
