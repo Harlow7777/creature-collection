@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "deploy": "gh-pages -d dist",
     "preview": "vite preview"
   },
   "repository": {
@@ -15,12 +16,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/Harlow7777/creature-collection/issues"
   },
   "homepage": "https://github.com/Harlow7777/creature-collection#readme",
   "devDependencies": {
+    "gh-pages": "^6.3.0",
     "vite": "^8.0.12"
   },
   "dependencies": {
