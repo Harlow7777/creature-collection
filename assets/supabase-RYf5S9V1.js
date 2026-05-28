@@ -1,0 +1,1 @@
+import{t as e}from"./supabase-eZuxIglC.js";export{e as supabase};

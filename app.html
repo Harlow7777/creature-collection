@@ -1,0 +1,634 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monstrum</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet" />
+
+  <!-- MAIN BUNDLE -->
+  <script type="module" crossorigin src="/creature-collection/assets/app-DLPOCx4W.js"></script>
+  <link rel="modulepreload" crossorigin href="/creature-collection/assets/supabase-eZuxIglC.js">
+  <link rel="modulepreload" crossorigin href="/creature-collection/assets/auth-BThjN8eP.js">
+  <link rel="stylesheet" crossorigin href="/creature-collection/assets/app-miksWSBs.css">
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="sidebar-logo">
+      <h1>Monstrum</h1>
+      <div class="tagline">Your realm awaits</div>
+    </div>
+
+    <div id="user-strip" class="user-strip">
+      <div class="user-details">
+        <div class="nav-username" id="nav-username">Adventurer</div>
+
+        <div class="currency-row">
+          <div class="currency-badge">💰 <span class="val" id="nav-currency">0</span></div>
+          <div class="currency-badge">💎 <span class="val rare-val" id="nav-premium">0</span></div>
+          <div id="gold-popup" class="gold-popup" aria-hidden="true"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <nav class="nav">
+
+      <div class="nav-section-label">Collect</div>
+      <button class="nav-item active" data-page="collection">
+        <span class="nav-icon">📖</span> Collection
+      </button>
+
+      <button class="nav-item" data-page="roll">
+        <span class="nav-icon">🎲</span> Roll
+      </button>
+
+      <div class="nav-section-label">Play</div>
+      <button class="nav-item" data-page="battle">
+        <span class="nav-icon">⚔️</span> Battle
+      </button>
+
+      <button class="nav-item" data-page="areas">
+        <span class="nav-icon">🏝️</span> Areas
+      </button>
+
+      <div class="nav-section-label">Account</div>
+      <button class="nav-item" data-page="shop">
+        <span class="nav-icon">🛒</span> Shop
+      </button>
+
+      <button class="nav-item" data-page="profile">
+        <span class="nav-icon">👤</span> Profile
+      </button>
+
+      <div class="nav-section-label">Developer</div>
+      <button class="nav-item" data-page="devtools">
+        <span class="nav-icon">🛠️</span> Dev Tools
+      </button>
+
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="logout-btn">Sign Out</button>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">Collection</div>
+      <div class="topbar-meta" id="page-meta">Your captured creatures</div>
+    </div>
+
+    <div class="pages">
+
+      <!-- COLLECTION -->
+      <div id="page-collection" class="page active">
+
+        <div class="section-header">
+          <div class="section-title">Showcase</div>
+          <div class="section-count">Top 3 display slots</div>
+        </div>
+
+        <div class="showcase" id="showcase-slots">
+          <div class="showcase-slot empty rank-1" data-slot="1">
+            <div class="rank">#1</div>
+            <div class="empty-text">Empty slot</div>
+          </div>
+
+          <div class="showcase-slot empty rank-2" data-slot="2">
+            <div class="rank">#2</div>
+            <div class="empty-text">Empty slot</div>
+          </div>
+
+          <div class="showcase-slot empty rank-3" data-slot="3">
+            <div class="rank">#3</div>
+            <div class="empty-text">Empty slot</div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">Your Collection</div>
+          <div class="section-count" id="collection-count">0 creatures</div>
+        </div>
+
+        <div class="collection-grid" id="collection-grid">
+          <div class="empty-state">
+            <div class="empty-icon"></div>
+            <div>No creatures yet. Head to Roll to begin your journey!</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ROLL -->
+      <div id="page-roll" class="page">
+
+        <div class="roll-center">
+
+          <div class="roll-hint center-muted">
+            Touch the portal to summon a creature from the void
+          </div>
+
+          <div class="modifier-row" id="active-modifiers"></div>
+
+          <div class="roll-portal" id="roll-portal">
+            <div class="roll-ring"></div>
+            <div id="roll-orb" class="roll-orb">🌀</div>
+          </div>
+
+          <div class="roll-result" id="roll-result">
+
+            <div class="result-card" id="result-card">
+              <div class="result-sprite" id="result-sprite"></div>
+              <div class="result-name" id="result-name"></div>
+              <div class="result-rarity" id="result-rarity"></div>
+              <div class="result-stats" id="result-stats"></div>
+            </div>
+
+            <div class="result-actions">
+              <button class="btn-keep" id="btn-keep">Keep</button>
+              <button class="btn-crush-result" id="btn-crush-now">Crush for $</button>
+            </div>
+
+          </div>
+
+          <div class="roll-footer muted-text">
+            Rolls remaining today:
+            <span class="accent-text" id="rolls-remaining">10</span>
+            · Use modifiers from Shop
+          </div>
+
+        </div>
+      </div>
+
+      <!-- BATTLE -->
+      <div id="page-battle" class="page">
+
+        <div class="battle-arena">
+
+          <!-- YOUR SIDE -->
+          <div class="fighter-column">
+
+            <!-- Fighter select panel (shown when no fighter chosen) -->
+            <div class="fighter-select-panel" id="fighter-select-panel">
+              <div class="fighter-select-header">Choose Your Fighter</div>
+              <div class="fighter-select-grid" id="fighter-select-grid">
+                <div class="fighter-select-empty">No creatures yet — go roll some!</div>
+              </div>
+            </div>
+
+            <!-- Fighter card (shown once fighter is chosen) -->
+            <div class="fighter active hidden" id="fighter-you">
+              <div class="fighter-sprite" id="you-sprite"></div>
+              <div class="fighter-name" id="you-name"></div>
+              <div class="hp-bar-wrap"><div class="hp-bar" id="you-hp-bar"></div></div>
+              <div class="hp-text" id="you-hp-text">— / —</div>
+              <button class="btn-fighter-action btn-attack" id="btn-attack" disabled>⚔️ Attack</button>
+              <button class="btn-fighter-action btn-swap" id="btn-swap-fighter">↩ Swap Fighter</button>
+            </div>
+
+          </div>
+
+          <div class="vs-badge">VS</div>
+
+          <!-- OPP SIDE -->
+          <div class="fighter-column">
+
+            <!-- Find opponent panel (shown when no opponent) -->
+            <div class="fighter find-opponent-panel" id="find-opponent-panel">
+              <div class="fighter-sprite">🌫️</div>
+              <div class="fighter-name">No Opponent</div>
+              <button class="btn-fighter-action btn-find-opp" id="btn-find-opponent">🎲 Find Opponent</button>
+            </div>
+
+            <!-- Opponent card (shown once opponent is found) -->
+            <div class="fighter hidden" id="fighter-opp">
+              <div class="fighter-sprite" id="opp-sprite"></div>
+              <div class="fighter-name" id="opp-name"></div>
+              <div class="hp-bar-wrap"><div class="hp-bar" id="opp-hp-bar"></div></div>
+              <div class="hp-text" id="opp-hp-text">— / —</div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="battle-log" id="battle-log"></div>
+
+      </div>
+
+      <!-- AREAS -->
+      <div id="page-areas" class="page">
+
+        <div class="areas-grid">
+
+          <div class="panel-card areas-card locked">
+            <div class="areas-icon">🌵</div>
+            <div class="areas-title">Ancient Forest</div>
+            <div class="areas-desc">Coming soon.</div>
+          </div>
+
+          <div class="panel-card areas-card locked">
+            <div class="areas-icon">🌋</div>
+            <div class="areas-title">Volcanic Rift</div>
+            <div class="areas-desc">Coming soon.</div>
+          </div>
+
+          <div class="panel-card areas-card locked">
+            <div class="areas-icon">🌊</div>
+            <div class="areas-title">Abyssal Depths</div>
+            <div class="areas-desc">Coming soon.</div>
+          </div>
+
+        </div>
+
+        <div class="areas-footer">
+          Assign creatures to unlock passive farming systems.
+        </div>
+
+      </div>
+
+      <!-- SHOP -->
+       <div id="page-shop" class="page">
+
+        <div class="section-header">
+          <div class="section-title">Profile Pics</div>
+          <div class="section-count">Exclusive avatars</div>
+        </div>
+
+        <div class="shop-grid shop-grid-spaced" style="margin-bottom:28px;">
+          <div class="shop-card">
+            <div class="shop-icon">🐉</div>
+            <div class="shop-item-name">Elder Dragon</div>
+            <div class="shop-item-desc">Legendary profile avatar for true collectors</div>
+            <div class="shop-price">💎 80</div>
+            <button class="btn-buy" onclick="shopBuyAvatar('elder_dragon', 80)">Buy</button>
+          </div>
+          <div class="shop-card">
+            <div class="shop-icon">👑</div>
+            <div class="shop-item-name">Champion Crown</div>
+            <div class="shop-item-desc">For those who dominate the arena</div>
+            <div class="shop-price">💎 120</div>
+            <button class="btn-buy" onclick="shopBuyAvatar('champion_crown', 120)">Buy</button>
+          </div>
+          <div class="shop-card">
+            <div class="shop-icon">💀</div>
+            <div class="shop-item-name">Void Wraith</div>
+            <div class="shop-item-desc">Dark spectral avatar for shadow collectors</div>
+            <div class="shop-price">💎 200</div>
+            <button class="btn-buy" onclick="shopBuyAvatar('void_wraith', 200)">Buy</button>
+          </div>
+          <div class="shop-card">
+            <div class="shop-icon">🌙</div>
+            <div class="shop-item-name">Moon Sage</div>
+            <div class="shop-item-desc">Mystical lunar caster avatar</div>
+            <div class="shop-price">💎 60</div>
+            <button class="btn-buy" onclick="shopBuyAvatar('moon_sage', 60)">Buy</button>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">Modifiers</div>
+        </div>
+
+        <div class="shop-grid shop-grid-spaced">
+          <div class="shop-card">
+            <div class="shop-icon">🔮</div>
+            <div class="shop-item-name">Rare Focus</div>
+            <div class="shop-item-desc">Doubles rare drop chance for 5 rolls</div>
+            <div class="shop-price">💰 200</div>
+            <button class="btn-buy"
+              onclick="showToast('Rare Focus purchased! Active for next 5 rolls.')">Buy</button>
+          </div>
+
+          <div class="shop-card">
+            <div class="shop-icon">✨</div>
+            <div class="shop-item-name">Legendary Aura</div>
+            <div class="shop-item-desc">5% legendary chance for 3 rolls</div>
+            <div class="shop-price">💎 50</div>
+            <button class="btn-buy"
+              onclick="showToast('Legendary Aura activated!')">Buy</button>
+          </div>
+
+          <div class="shop-card">
+            <div class="shop-icon">🔥</div>
+            <div class="shop-item-name">Type Lens: Fire</div>
+            <div class="shop-item-desc">Next roll guaranteed fire-type creature</div>
+            <div class="shop-price">💰 150</div>
+            <button class="btn-buy"
+              onclick="showToast('Fire Lens activated for your next roll!')">Buy</button>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">Pets</div>
+        </div>
+
+        <div class="shop-grid shop-grid-spaced">
+          <div class="shop-card">
+            <div class="shop-icon">🐱</div>
+            <div class="shop-item-name">Spirit Kitten</div>
+            <div class="shop-item-desc">+10% XP gain for assigned creature</div>
+            <div class="shop-price">💰 300</div>
+            <button class="btn-buy"
+              onclick="showToast('Spirit Kitten added to your pets!')">Buy</button>
+          </div>
+
+          <div class="shop-card">
+            <div class="shop-icon">🐸</div>
+            <div class="shop-item-name">Shadow Pup</div>
+            <div class="shop-item-desc">+8% ATK boost for assigned creature</div>
+            <div class="shop-price">💎 30</div>
+            <button class="btn-buy"
+              onclick="showToast('Shadow Pup added to your pets!')">Buy</button>
+          </div>
+
+          <div class="shop-card">
+            <div class="shop-icon">🦋</div>
+            <div class="shop-item-name">Lunar Moth</div>
+            <div class="shop-item-desc">+12% DEF boost for assigned creature</div>
+            <div class="shop-price">💰 350</div>
+            <button class="btn-buy"
+              onclick="showToast('Lunar Moth added to your pets!')">Buy</button>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">Appearance</div>
+        </div>
+
+        <div class="shop-grid">
+          <div class="shop-card">
+            <div class="shop-icon">✨</div>
+            <div class="shop-item-name">Golden Frame</div>
+            <div class="shop-item-desc">Shimmering gold display border</div>
+            <div class="shop-price">💎 20</div>
+            <button class="btn-buy"
+              onclick="showToast('Golden Frame unlocked!')">Buy</button>
+          </div>
+
+          <div class="shop-card">
+            <div class="shop-icon">🌈</div>
+            <div class="shop-item-name">Prismatic Skin</div>
+            <div class="shop-item-desc">Rainbow colour shift effect</div>
+            <div class="shop-price">💎 75</div>
+            <button class="btn-buy"
+              onclick="showToast('Prismatic Skin unlocked!')">Buy</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- PROFILE -->
+      <div id="page-profile" class="page">
+
+        <div class="profile-grid">
+
+          <div class="profile-card">
+            <div class="avatar-wrap" id="avatar-wrap">
+              <div class="avatar" id="profile-avatar">🧑</div>
+            </div>
+            <div class="profile-username" id="profile-username">Adventurer</div>
+            <div class="profile-since">Member since today</div>
+
+            <div class="profile-stats">
+              <div class="stat-row">
+                <span class="label">Creatures</span>
+                <span class="value" id="p-creatures">0</span>
+              </div>
+
+              <div class="stat-row">
+                <span class="label">Battles Won</span>
+                <span class="value" id="p-wins">0</span>
+              </div>
+
+              <div class="stat-row">
+                <span class="label">Rolls Made</span>
+                <span class="value" id="p-rolls">0</span>
+              </div>
+
+              <div class="stat-row">
+                <span class="label">Gold</span>
+                <span class="value gold" id="p-gold">0</span>
+              </div>
+
+              <div class="stat-row">
+                <span class="label">Gems</span>
+                <span class="value rare" id="p-gems">0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-panel">
+
+            <div class="panel-card">
+              <div class="panel-card-title">Achievements</div>
+              <div class="achievement-list" id="achievement-list"></div>
+            </div>
+
+            <div class="panel-card">
+              <div class="panel-card-title">Settings</div>
+
+              <div class="settings-list">
+
+                <div class="setting-row">
+                  <span>Email notifications</span>
+                  <span class="muted-accent">Coming soon</span>
+                </div>
+
+                <div class="setting-row">
+                  <span>Change username</span>
+                  <span class="muted-accent">Coming soon</span>
+                </div>
+
+                <div class="setting-row danger">
+                  <button class="btn-modal-danger"
+                    onclick="showToast('Feature coming soon.')">Delete Account</button>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div id="page-devtools" class="page">
+
+        <div class="profile-grid">
+
+          <div class="profile-card">
+            <div class="profile-username">Dev Tools</div>
+            <div class="muted-text">
+              Adjust test profile values and creature stats for debugging.
+            </div>
+          </div>
+
+          <div class="profile-panel">
+
+            <div class="panel-card">
+              <div class="panel-card-title">Profile overrides</div>
+
+              <div class="dev-tools-grid">
+
+                <label class="dev-input-row">
+                  <span>Gold</span>
+                  <input id="dev-gold" class="dev-input" type="number" min="0">
+                </label>
+
+                <label class="dev-input-row">
+                  <span>Gems</span>
+                  <input id="dev-gems" class="dev-input" type="number" min="0">
+                </label>
+
+                <label class="dev-input-row">
+                  <span>Rolls today</span>
+                  <input id="dev-rolls" class="dev-input" type="number" min="0">
+                </label>
+
+                <label class="dev-input-row">
+                  <span>Battles won</span>
+                  <input id="dev-wins" class="dev-input" type="number" min="0">
+                </label>
+
+                <label class="dev-input-row">
+                  <span>Total rolls</span>
+                  <input id="dev-total-rolls" class="dev-input" type="number" min="0">
+                </label>
+
+              </div>
+
+              <div class="dev-actions">
+                <button class="btn-modal-primary" id="dev-save-profile">Save profile</button>
+                <button class="btn-modal-danger" id="dev-reset-profile">Reset</button>
+              </div>
+
+            </div>
+
+            <div class="panel-card">
+              <div class="panel-card-title">Creature stat editor</div>
+
+              <div class="dev-tools-grid">
+
+                <label class="dev-input-row">
+                  <span>Creature</span>
+                  <select id="dev-creature-select" class="dev-input"></select>
+                </label>
+
+                <label class="dev-input-row">
+                  <span>HP</span>
+                  <input id="dev-creature-hp" class="dev-input" type="number" min="1">
+                </label>
+
+                <label class="dev-input-row">
+                  <span>ATK</span>
+                  <input id="dev-creature-atk" class="dev-input" type="number" min="0">
+                </label>
+
+                <label class="dev-input-row">
+                  <span>SPD</span>
+                  <input id="dev-creature-spd" class="dev-input" type="number" min="0">
+                </label>
+
+              </div>
+
+              <div class="dev-actions">
+                <button class="btn-modal-primary" id="dev-save-creature">
+                  Update creature
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="creature-modal">
+  <div class="modal">
+
+    <button class="modal-close" id="modal-close">✖</button>
+
+    <div class="modal-sprite" id="m-sprite"></div>
+    <div class="modal-name" id="m-name"></div>
+    <div class="modal-meta" id="m-meta"></div>
+
+    <div class="modal-stats" id="m-stats"></div>
+
+    <div class="modal-xp">
+      <div class="modal-xp-label">
+        <span>XP Progress</span>
+        <span id="m-xp-text">0 / 100</span>
+      </div>
+      <div class="modal-xp-bar">
+        <div class="modal-xp-fill" id="m-xp-fill"></div>
+      </div>
+    </div>
+
+    <div class="modal-section-label">Pet Companion</div>
+
+    <div class="pet-slot" id="m-pet-slot">
+      <span>🐾 Assign a pet</span>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-primary" id="m-btn-showcase">Pin</button>
+      <button class="btn-modal-danger" id="m-btn-crush">Crush</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Crush target picker modal -->
+<div class="modal-overlay" id="crush-target-modal">
+  <div class="modal">
+    <button class="modal-close" id="crush-target-close">✖</button>
+    <div class="modal-name" style="margin-bottom:6px;">Send XP To...</div>
+    <div style="font-size:0.85rem;color:var(--muted);font-style:italic;text-align:center;margin-bottom:18px;">
+      Choose which creature receives the XP from crushing <strong id="crush-source-name"></strong>
+    </div>
+    <div class="crush-target-grid" id="crush-target-grid"></div>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn-modal-primary" id="crush-target-confirm" disabled>Confirm</button>
+      <button class="btn-modal-danger" id="crush-target-gold">Take Gold Instead</button>
+    </div>
+  </div>
+</div>
+
+<!-- Avatar picker modal -->
+<div class="modal-overlay" id="avatar-modal">
+  <div class="modal avatar-picker-modal">
+    <button class="modal-close" id="avatar-modal-close">✖</button>
+    <div class="modal-name" style="margin-bottom:4px;">Choose Profile Pic</div>
+    <div style="font-size:0.82rem;color:var(--muted);font-style:italic;text-align:center;margin-bottom:20px;">
+      Earn more by completing achievements, capturing creatures, and visiting the shop
+    </div>
+    <div id="avatar-picker-content"></div>
+    <div class="modal-actions" style="margin-top:20px;">
+      <button class="btn-modal-primary" id="avatar-confirm-btn" disabled>Set as Profile Pic</button>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>
