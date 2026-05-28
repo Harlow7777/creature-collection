@@ -1,4 +1,4 @@
-export function initializeBattlePage({ state, updateUI, persistProfile, showToast, saveState, getCreatureTemplates }) {
+export function initializeBattlePage({ state, updateUI, persistProfile, showToast, showGoldPopup, saveState, getCreatureTemplates }) {
 
   const battleState = {
     yourFighter: null,
@@ -22,8 +22,11 @@ export function initializeBattlePage({ state, updateUI, persistProfile, showToas
       return
     }
 
+    // Cards are locked (unclickable) once an opponent has been chosen
+    const locked = !!battleState.oppFighter
+
     grid.innerHTML = state.collection.map((c, i) => `
-      <div class="fighter-pick-card rarity-${c.rarity}" data-idx="${i}">
+      <div class="fighter-pick-card rarity-${c.rarity}${locked ? ' locked' : ''}" data-idx="${i}">
         <div class="fighter-pick-sprite">${c.sprite || '?'}</div>
         <div class="fighter-pick-name">${c.nickname || c.name}</div>
         <div class="fighter-pick-level">Lv ${c.level}</div>
@@ -31,11 +34,13 @@ export function initializeBattlePage({ state, updateUI, persistProfile, showToas
       </div>
     `).join('')
 
-    grid.querySelectorAll('.fighter-pick-card').forEach(card => {
-      card.addEventListener('click', () => {
-        confirmFighter(state.collection[parseInt(card.dataset.idx)])
+    if (!locked) {
+      grid.querySelectorAll('.fighter-pick-card').forEach(card => {
+        card.addEventListener('click', () => {
+          confirmFighter(state.collection[parseInt(card.dataset.idx)])
+        })
       })
-    })
+    }
   }
 
   window.refreshBattleSelectGrid = renderSelectGrid
@@ -45,7 +50,7 @@ export function initializeBattlePage({ state, updateUI, persistProfile, showToas
     battleState.yourHp = creature.base_hp
 
     el('fighter-select-panel')?.classList.add('hidden')
-    el('fighter-you')?.classList.remove('hidden', 'defeated')
+    el('fighter-you')?.classList.remove('hidden')
     el('fighter-you')?.classList.remove('defeated')
 
     el('you-sprite').textContent = creature.sprite || '?'
@@ -69,6 +74,7 @@ export function initializeBattlePage({ state, updateUI, persistProfile, showToas
   wireHandler('btn-swap-fighter', 'click', () => {
     if (battleState.inBattle) { showToast("Can't swap mid-battle!"); return }
     battleState.yourFighter = null
+    battleState.yourHp = 0
     el('fighter-you')?.classList.add('hidden')
     el('fighter-select-panel')?.classList.remove('hidden')
     el('btn-attack').disabled = true
@@ -90,6 +96,9 @@ export function initializeBattlePage({ state, updateUI, persistProfile, showToas
     el('opp-sprite').textContent = template.sprite || '?'
     el('opp-name').textContent   = template.name
     setHpBar('opp', battleState.oppHp, template.base_hp)
+
+    // Lock the fighter select grid now that an opponent is chosen
+    renderSelectGrid()
 
     if (battleState.yourFighter && battleState.yourHp > 0) {
       battleState.inBattle = true
@@ -145,9 +154,10 @@ export function initializeBattlePage({ state, updateUI, persistProfile, showToas
     el('btn-attack').disabled = true
 
     if (won) {
-      spawnFloat('opp', 'Victory! +50g', 'dmg-win')
+      spawnFloat('opp', 'Victory!', 'dmg-win')
       state.wins++
       state.currency += 50
+      showGoldPopup(50)
       setTimeout(() => el('fighter-opp')?.classList.add('defeated'), 300)
     } else {
       spawnFloat('you', 'Defeated...', 'dmg-win')
@@ -165,8 +175,15 @@ export function initializeBattlePage({ state, updateUI, persistProfile, showToas
       el('fighter-opp')?.classList.add('hidden')
       el('find-opponent-panel')?.classList.remove('hidden')
 
-      // On loss reset your side too
-      if (!won) {
+      if (won) {
+        // Win: keep the same fighter but reset their HP to full for the next fight
+        battleState.yourHp = battleState.yourFighter?.base_hp || 0
+        setHpBar('you', battleState.yourHp, battleState.yourFighter?.base_hp || 1)
+        el('fighter-you')?.classList.remove('defeated')
+        // Unlock the select grid so swap still works
+        renderSelectGrid()
+      } else {
+        // Loss: send back to fighter select
         battleState.yourFighter = null
         battleState.yourHp = 0
         el('fighter-you')?.classList.add('hidden')
@@ -185,12 +202,10 @@ export function initializeBattlePage({ state, updateUI, persistProfile, showToas
     node.className = `dmg-float ${cls}`
     node.textContent = text
 
-    // Randomise horizontal position slightly so stacked hits don't overlap
     const offset = (Math.random() - 0.5) * 40
     node.style.left = `calc(50% + ${offset}px)`
 
     target.appendChild(node)
-    // Remove after animation completes
     node.addEventListener('animationend', () => node.remove())
   }
 

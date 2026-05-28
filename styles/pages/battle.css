@@ -212,6 +212,17 @@
   transform: translateY(-2px);
 }
 
+.fighter-pick-card.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.fighter-pick-card.locked:hover {
+  border-color: var(--border);
+  background: var(--surface2);
+  transform: none;
+}
+
 .fighter-pick-card.selected {
   border-color: var(--accent);
   background: rgba(160, 122, 255, 0.12);

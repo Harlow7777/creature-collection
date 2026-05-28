@@ -328,6 +328,7 @@ function updateUI() {
   document.getElementById('p-gems').textContent = state.premium
   document.getElementById('rolls-remaining').textContent = state.rollsToday
   updateAvatar()
+  renderAchievements()
   renderCollection(state.collection)
   renderShowcase(state.collection)
   if (document.getElementById('page-devtools')?.classList.contains('active')) {
@@ -393,6 +394,7 @@ initializeBattlePage({
   updateUI,
   persistProfile,
   showToast,
+  showGoldPopup,
   saveState,
   getCreatureTemplates: () => CREATURE_TEMPLATES,
 })
@@ -659,6 +661,95 @@ function isAvatarUnlocked(key, av) {
   if (av.category === 'shop') return state.unlockedAvatars.includes(key)
   if (av.unlockCheck) return av.unlockCheck(state)
   return false
+}
+
+function renderAchievements() {
+  const list = document.getElementById('achievement-list')
+  if (!list) return
+
+  // Pull all achievement and badge entries from AVATAR_CATALOGUE
+  // and build a unified definition list for the profile panel.
+  const ACHIEVEMENT_DEFS = [
+    // Mirrors AVATAR_CATALOGUE achievement/badge entries plus progress details
+    {
+      key: 'first_roller',
+      icon: '🥚',
+      label: 'First Summon',
+      desc: 'Roll your first creature',
+      current: () => Math.min(state.totalRolls, 1),
+      goal: 1,
+    },
+    {
+      key: 'first_blood',
+      icon: '⚔️',
+      label: 'First Blood',
+      desc: 'Win your first battle',
+      current: () => Math.min(state.wins, 1),
+      goal: 1,
+    },
+    {
+      key: 'legend_hunter',
+      icon: '🌟',
+      label: 'Legend Hunter',
+      desc: 'Own a Legendary creature',
+      current: () => state.collection.some(c => c.rarity === 'legendary') ? 1 : 0,
+      goal: 1,
+    },
+    {
+      key: 'crusher',
+      icon: '💥',
+      label: 'Crusher',
+      desc: 'Crush 5 creatures',
+      current: () => Math.min(state.totalCrushes || 0, 5),
+      goal: 5,
+    },
+    {
+      key: 'collector',
+      icon: '📚',
+      label: 'Collector',
+      desc: 'Collect 10 creatures',
+      current: () => Math.min(state.collection.length, 10),
+      goal: 10,
+    },
+    {
+      key: 'arena_veteran',
+      icon: '🏆',
+      label: 'Arena Veteran',
+      desc: 'Win 10 battles',
+      current: () => Math.min(state.wins, 10),
+      goal: 10,
+    },
+    {
+      key: 'badge_5',
+      icon: '🎖️',
+      label: '5 Wins',
+      desc: 'Win 5 battles',
+      current: () => Math.min(state.wins, 5),
+      goal: 5,
+    },
+    {
+      key: 'badge_25',
+      icon: '🥈',
+      label: '25 Wins',
+      desc: 'Win 25 battles',
+      current: () => Math.min(state.wins, 25),
+      goal: 25,
+    },
+  ]
+
+  list.innerHTML = ACHIEVEMENT_DEFS.map(a => {
+    const current = a.current()
+    const done = current >= a.goal
+    return `
+      <div class="achievement${done ? '' : ' locked'}">
+        <span class="icon">${a.icon}</span>
+        <div>
+          <div>${a.label}</div>
+          <div class="muted">${a.desc}</div>
+        </div>
+        <div class="progress" style="color:${done ? 'var(--rare)' : ''}">${current} / ${a.goal}</div>
+      </div>`
+  }).join('')
 }
 
 function updateAvatar() {

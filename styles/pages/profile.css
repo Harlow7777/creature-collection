@@ -120,6 +120,14 @@
   white-space: nowrap;
 }
 
+.achievement.locked {
+  opacity: 0.4;
+}
+
+.achievement.locked .icon {
+  filter: grayscale(1);
+}
+
 .settings-list {
   display: flex;
   flex-direction: column;

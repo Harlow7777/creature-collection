@@ -95,7 +95,12 @@
     transition: opacity 0.15s;
 }
 
-.btn-modal-primary:hover {
+.btn-modal-primary:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.btn-modal-primary:hover:not(:disabled) {
     opacity: 0.85;
 }
 

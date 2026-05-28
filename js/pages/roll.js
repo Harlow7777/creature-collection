@@ -4,7 +4,6 @@ const RARITY_WEIGHTS = { common: 60, uncommon: 25, rare: 12, legendary: 3 }
 const RARITY_XP = { common: 10, uncommon: 25, rare: 60, legendary: 200 }
 
 export function initializeRollPage({ state, updateUI, persistProfile, persistKeptCreature, showToast, showGoldPopup, saveState, getCreatureTemplates, rarityColor }) {
-  document.getElementById('roll-btn').addEventListener('click', doRoll)
   document.getElementById('roll-portal').addEventListener('click', doRoll)
 
   document.getElementById('btn-keep').addEventListener('click', async () => {
@@ -35,6 +34,7 @@ export function initializeRollPage({ state, updateUI, persistProfile, persistKep
     const xpGain = RARITY_XP[state.pendingRoll.rarity]
     const goldGain = Math.round(xpGain * 0.5)
     state.currency += goldGain
+    state.totalCrushes = (state.totalCrushes || 0) + 1
     state.pendingRoll = null
     document.getElementById('roll-result').classList.remove('visible')
     document.getElementById('roll-orb').textContent = '🌀'
