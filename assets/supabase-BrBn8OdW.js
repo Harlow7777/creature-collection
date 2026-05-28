@@ -1,0 +1,1 @@
+import{createClient as e}from"https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";var t=e(`https://bkpzkrucxvoiqqstljxu.supabase.co`,`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrcHprcnVjeHZvaXFxc3Rsanh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzIzMjQsImV4cCI6MjA5MzA0ODMyNH0.4rqx8ntcPV8_70wTBq0t6ouBbNR22jgQFNs6sDRn3qo`);export{t};
