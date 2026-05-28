@@ -17,7 +17,7 @@ export async function signIn(email, password) {
 
 export async function signOut() {
   await supabase.auth.signOut()
-  window.location.href = '/index.html'
+  window.location.href = '/creature-collection/'
 }
 
 export async function getSession() {
@@ -32,6 +32,6 @@ export async function getUser() {
 
 export async function requireAuth() {
   const session = await getSession()
-  if (!session) window.location.href = '/index.html'
+  if (!session) window.location.href = '/creature-collection/'
   return session
 }
