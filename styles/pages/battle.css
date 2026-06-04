@@ -119,7 +119,12 @@
   color: var(--muted);
 }
 
-.btn-swap:hover {
+.btn-swap:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-swap:hover:not(:disabled) {
   border-color: var(--accent) !important;
   color: var(--accent);
 }
@@ -130,7 +135,12 @@
   color: var(--rare);
 }
 
-.btn-find-opp:hover {
+.btn-find-opp:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-find-opp:hover:not(:disabled) {
   background: rgba(74, 240, 200, 0.16);
 }
 

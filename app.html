@@ -83,9 +83,17 @@
   <main class="main">
 
     <div class="topbar">
-      <div class="topbar-title" id="page-title">Collection</div>
+      <div class="topbar-left">
+        <button class="hamburger-btn" id="hamburger-btn" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="topbar-title" id="page-title">Collection</div>
+      </div>
       <div class="topbar-meta" id="page-meta">Your captured creatures</div>
     </div>
+
+    <!-- Mobile sidebar backdrop -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
     <div class="pages">
 
@@ -192,7 +200,7 @@
               <div class="hp-bar-wrap"><div class="hp-bar" id="you-hp-bar"></div></div>
               <div class="hp-text" id="you-hp-text">— / —</div>
               <button class="btn-fighter-action btn-attack" id="btn-attack" disabled>⚔️ Attack</button>
-              <button class="btn-fighter-action btn-swap" id="btn-swap-fighter">↩ Swap Fighter</button>
+              <button class="btn-fighter-action btn-swap" id="btn-swap-fighter" disabled>↩ Swap Fighter</button>
             </div>
 
           </div>
@@ -338,8 +346,7 @@
             <div class="shop-item-name">Spirit Kitten</div>
             <div class="shop-item-desc">+10% XP gain for assigned creature</div>
             <div class="shop-price">💰 300</div>
-            <button class="btn-buy"
-              onclick="showToast('Spirit Kitten added to your pets!')">Buy</button>
+            <button class="btn-buy" onclick="shopBuyPet('spirit_kitten')">Buy</button>
           </div>
 
           <div class="shop-card">
@@ -347,8 +354,7 @@
             <div class="shop-item-name">Shadow Pup</div>
             <div class="shop-item-desc">+8% ATK boost for assigned creature</div>
             <div class="shop-price">💎 30</div>
-            <button class="btn-buy"
-              onclick="showToast('Shadow Pup added to your pets!')">Buy</button>
+            <button class="btn-buy" onclick="shopBuyPet('shadow_pup')">Buy</button>
           </div>
 
           <div class="shop-card">
@@ -356,8 +362,7 @@
             <div class="shop-item-name">Lunar Moth</div>
             <div class="shop-item-desc">+12% DEF boost for assigned creature</div>
             <div class="shop-price">💰 350</div>
-            <button class="btn-buy"
-              onclick="showToast('Lunar Moth added to your pets!')">Buy</button>
+            <button class="btn-buy" onclick="shopBuyPet('lunar_moth')">Buy</button>
           </div>
         </div>
 
@@ -581,7 +586,7 @@
 
     <div class="modal-section-label">Pet Companion</div>
 
-    <div class="pet-slot" id="m-pet-slot">
+    <div class="pet-slot" id="m-pet-slot" style="cursor:pointer;">
       <span>🐾 Assign a pet</span>
     </div>
 
@@ -590,6 +595,22 @@
       <button class="btn-modal-danger" id="m-btn-crush">Crush</button>
     </div>
 
+  </div>
+</div>
+
+<!-- Pet Picker Modal -->
+<div class="modal-overlay" id="pet-modal">
+  <div class="modal">
+    <button class="modal-close" id="pet-modal-close">✖</button>
+    <div class="modal-name" style="margin-bottom:6px;">Assign Pet</div>
+    <div style="font-size:0.82rem;color:var(--muted);font-style:italic;text-align:center;margin-bottom:18px;">
+      Choose a pet to assign to <strong id="pet-target-name"></strong>
+    </div>
+    <div class="crush-target-grid" id="pet-picker-grid"></div>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn-modal-primary" id="pet-assign-btn" disabled>Assign</button>
+      <button class="btn-modal-danger" id="pet-unassign-btn">Remove Pet</button>
+    </div>
   </div>
 </div>
 

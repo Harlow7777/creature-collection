@@ -18,6 +18,7 @@ const state = {
   premium: 10,
   collection: [],
   showcase: [],
+  ownedPets: [],      // { _id, petKey, name, icon, bonusType, bonusValue, assignedTo }
   rollsToday: 10,
   totalRolls: 0,
   wins: 0,
@@ -71,6 +72,8 @@ async function bootstrap() {
     await loadCreatureTemplates()
     await loadProfile()
     await loadUserCollection()
+    await loadUserPets()
+    syncPetsToCollection()
   } catch (err) {
     console.error('Bootstrap error:', err)
   }
@@ -176,6 +179,224 @@ async function loadUserCollection() {
     showcaseSlot: uc.display_order,
   }))
 }
+
+// ── PET CATALOGUE (mirrors shop + DB seed) ────────────────
+const PET_CATALOGUE = {
+  spirit_kitten: { name: 'Spirit Kitten', icon: '🐱', bonusType: 'xp_boost',  bonusValue: 0.10, cost: 300, currency: 'soft',    desc: '+10% XP gain' },
+  shadow_pup:    { name: 'Shadow Pup',    icon: '🐺', bonusType: 'atk_boost', bonusValue: 0.08, cost: 30,  currency: 'premium', desc: '+8% ATK' },
+  lunar_moth:    { name: 'Lunar Moth',    icon: '🦋', bonusType: 'def_boost', bonusValue: 0.12, cost: 350, currency: 'soft',    desc: '+12% DEF' },
+  storm_sprite:  { name: 'Storm Sprite',  icon: '⚡', bonusType: 'spd_boost', bonusValue: 0.10, cost: 300, currency: 'soft',    desc: '+10% SPD' },
+  ember_drake:   { name: 'Ember Drake',   icon: '🔥', bonusType: 'atk_boost', bonusValue: 0.20, cost: 80,  currency: 'premium', desc: '+20% ATK' },
+  tidefish:      { name: 'Tidefish',      icon: '🐠', bonusType: 'hp_boost',  bonusValue: 0.08, cost: 200, currency: 'soft',    desc: '+8% HP' },
+  crystal_wisp:  { name: 'Crystal Wisp', icon: '💎', bonusType: 'xp_boost',  bonusValue: 0.15, cost: 60,  currency: 'premium', desc: '+15% XP gain' },
+  rootling:      { name: 'Rootling',      icon: '🌱', bonusType: 'def_boost', bonusValue: 0.06, cost: 150, currency: 'soft',    desc: '+6% DEF' },
+}
+
+async function loadUserPets() {
+  if (!user) return
+  const { data, error } = await supabase
+    .from('user_pets')
+    .select('id, assigned_to, pets(id, name, bonus_type, bonus_value, sprite_url)')
+    .eq('user_id', user.id)
+  if (error) { console.error('loadUserPets error:', error); return }
+
+  state.ownedPets = (data || []).map(up => {
+    // Match to catalogue by name for icon/desc fallback
+    const catKey = Object.entries(PET_CATALOGUE).find(([, v]) => v.name === up.pets?.name)?.[0]
+    const cat = catKey ? PET_CATALOGUE[catKey] : null
+    return {
+      _id:        up.id,
+      petKey:     catKey || up.pets?.name,
+      name:       up.pets?.name || 'Unknown Pet',
+      icon:       cat?.icon || up.pets?.sprite_url || '🐾',
+      bonusType:  up.pets?.bonus_type,
+      bonusValue: up.pets?.bonus_value,
+      desc:       cat?.desc || `+${Math.round((up.pets?.bonus_value || 0) * 100)}% ${up.pets?.bonus_type}`,
+      assignedTo: up.assigned_to,   // user_creatures._id or null
+    }
+  })
+
+  // Attach pet objects to creatures in collection for easy access
+  syncPetsToCollection()
+}
+
+function syncPetsToCollection() {
+  // Clear all existing pet refs first
+  state.collection.forEach(c => { c.pet = null })
+  // Re-attach based on user_pets.assigned_to
+  state.ownedPets.forEach(pet => {
+    if (pet.assignedTo) {
+      const creature = state.collection.find(c => c._id === pet.assignedTo)
+      if (creature) creature.pet = pet
+    }
+  })
+}
+
+// Apply pet bonuses to get effective stats for display/battle
+function applyPetBonus(creature) {
+  const pet = creature.pet
+  if (!pet) return { ...creature }
+  const result = { ...creature }
+  const mult = 1 + (pet.bonusValue || 0)
+  switch (pet.bonusType) {
+    case 'atk_boost': result.base_atk = Math.round(result.base_atk * mult); break
+    case 'def_boost': result.base_def = Math.round(result.base_def * mult); break
+    case 'spd_boost': result.base_spd = Math.round(result.base_spd * mult); break
+    case 'hp_boost':  result.base_hp  = Math.round(result.base_hp  * mult); break
+    // xp_boost is applied in checkEvolution
+  }
+  return result
+}
+window.applyPetBonus = applyPetBonus
+
+// ── SHOP: BUY PET ─────────────────────────────────────────
+window.shopBuyPet = async function(petKey) {
+  const def = PET_CATALOGUE[petKey]
+  if (!def) return
+
+  // Cost check
+  if (def.currency === 'premium') {
+    if (state.premium < def.cost) { showToast(`Not enough gems! Need 💎 ${def.cost}`); return }
+    state.premium -= def.cost
+  } else {
+    if (state.currency < def.cost) { showToast(`Not enough gold! Need 💰 ${def.cost}`); return }
+    state.currency -= def.cost
+  }
+
+  // Look up pet template id by name in the DB
+  const { data: petTemplate } = await supabase
+    .from('pets').select('id').eq('name', def.name).single()
+  if (!petTemplate) { showToast('Pet not found in database — run seed.sql first.'); return }
+
+  const { data: newRow, error } = await supabase
+    .from('user_pets')
+    .insert({ user_id: user.id, pet_id: petTemplate.id })
+    .select('id')
+    .single()
+  if (error) { console.error('shopBuyPet error:', error); showToast('Purchase failed.'); return }
+
+  state.ownedPets.push({
+    _id: newRow.id,
+    petKey,
+    name:       def.name,
+    icon:       def.icon,
+    bonusType:  def.bonusType,
+    bonusValue: def.bonusValue,
+    desc:       def.desc,
+    assignedTo: null,
+  })
+
+  await persistProfile()
+  updateUI()
+  saveState()
+  showToast(`${def.icon} ${def.name} added to your pets!`)
+}
+
+// ── PET PICKER ────────────────────────────────────────────
+let petPickerTargetIdx = null
+let petPickerSelectedPetId = null
+
+function openPetPicker(creatureIdx) {
+  petPickerTargetIdx = creatureIdx
+  petPickerSelectedPetId = null
+  const creature = state.collection[creatureIdx]
+  if (!creature) return
+
+  document.getElementById('pet-target-name').textContent = creature.nickname || creature.name
+  document.getElementById('pet-assign-btn').disabled = true
+
+  const grid = document.getElementById('pet-picker-grid')
+  const unassignedPets = state.ownedPets.filter(p => !p.assignedTo || p.assignedTo === creature._id)
+
+  if (!unassignedPets.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-style:italic;padding:20px 0;">
+      No pets available — buy some in the Shop!
+    </div>`
+  } else {
+    grid.innerHTML = unassignedPets.map(pet => `
+      <div class="crush-target-card" data-pet-id="${pet._id}" style="gap:6px;">
+        <div style="font-size:28px;line-height:1;">${pet.icon}</div>
+        <div style="font-size:0.68rem;font-weight:600;text-align:center;">${pet.name}</div>
+        <div style="font-size:0.6rem;color:var(--accent);">${pet.desc}</div>
+        ${pet.assignedTo === creature._id
+          ? `<div style="font-size:0.55rem;color:var(--rare);">Currently assigned</div>`
+          : ''}
+      </div>`).join('')
+
+    grid.querySelectorAll('.crush-target-card').forEach(card => {
+      card.addEventListener('click', () => {
+        grid.querySelectorAll('.crush-target-card').forEach(c => c.classList.remove('selected'))
+        card.classList.add('selected')
+        petPickerSelectedPetId = card.dataset.petId
+        document.getElementById('pet-assign-btn').disabled = false
+      })
+    })
+  }
+
+  // Show/hide unassign button based on whether creature already has a pet
+  document.getElementById('pet-unassign-btn').style.display = creature.pet ? '' : 'none'
+
+  document.getElementById('pet-modal').classList.add('open')
+}
+
+document.getElementById('pet-modal-close').addEventListener('click', () => {
+  document.getElementById('pet-modal').classList.remove('open')
+})
+document.getElementById('pet-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('pet-modal'))
+    document.getElementById('pet-modal').classList.remove('open')
+})
+
+document.getElementById('pet-assign-btn').addEventListener('click', async () => {
+  if (!petPickerSelectedPetId || petPickerTargetIdx === null) return
+  const creature = state.collection[petPickerTargetIdx]
+  const pet = state.ownedPets.find(p => p._id === petPickerSelectedPetId)
+  if (!creature || !pet) return
+
+  // Unassign from previous creature if needed
+  if (pet.assignedTo && pet.assignedTo !== creature._id) {
+    const prev = state.collection.find(c => c._id === pet.assignedTo)
+    if (prev) prev.pet = null
+  }
+  // Unassign any existing pet from this creature
+  if (creature.pet && creature.pet._id !== pet._id) {
+    creature.pet.assignedTo = null
+    await supabase.from('user_pets').update({ assigned_to: null }).eq('id', creature.pet._id)
+  }
+
+  pet.assignedTo = creature._id
+  creature.pet = pet
+  await supabase.from('user_pets').update({ assigned_to: creature._id }).eq('id', pet._id)
+
+  document.getElementById('pet-modal').classList.remove('open')
+  // Re-open creature modal with updated pet info
+  openCreatureModal(petPickerTargetIdx)
+  updateUI()
+  showToast(`${pet.icon} ${pet.name} assigned to ${creature.name}!`)
+})
+
+document.getElementById('pet-unassign-btn').addEventListener('click', async () => {
+  if (petPickerTargetIdx === null) return
+  const creature = state.collection[petPickerTargetIdx]
+  if (!creature?.pet) return
+
+  const pet = creature.pet
+  pet.assignedTo = null
+  creature.pet = null
+  await supabase.from('user_pets').update({ assigned_to: null }).eq('id', pet._id)
+
+  document.getElementById('pet-modal').classList.remove('open')
+  openCreatureModal(petPickerTargetIdx)
+  updateUI()
+  showToast(`${pet.icon} ${pet.name} unassigned.`)
+})
+
+// Wire pet slot click in creature modal
+document.getElementById('m-pet-slot').addEventListener('click', () => {
+  if (currentModalIdx === null) return
+  document.getElementById('creature-modal').classList.remove('open')
+  openPetPicker(currentModalIdx)
+})
 
 async function persistKeptCreature(creature) {
   if (!user) return null
@@ -354,19 +575,41 @@ function openCreatureModal(index) {
   document.getElementById('m-stats').innerHTML =
     statBox('HP', creature.base_hp) + statBox('ATK', creature.base_atk) + statBox('DEF', creature.base_def) + statBox('SPD', creature.base_spd)
 
+  // Show effective stats with pet bonus applied
+  const effective = applyPetBonus(creature)
+  const showEffective = creature.pet &&
+    (effective.base_hp !== creature.base_hp || effective.base_atk !== creature.base_atk ||
+     effective.base_def !== creature.base_def || effective.base_spd !== creature.base_spd)
+  document.getElementById('m-stats').innerHTML =
+    statBox('HP',  creature.base_hp,  showEffective ? effective.base_hp  : null) +
+    statBox('ATK', creature.base_atk, showEffective ? effective.base_atk : null) +
+    statBox('DEF', creature.base_def, showEffective ? effective.base_def : null) +
+    statBox('SPD', creature.base_spd, showEffective ? effective.base_spd : null)
+
   document.getElementById('m-xp-text').textContent = `${creature.xp} / ${xpNeeded}`
   document.getElementById('m-xp-fill').style.width = xpPct + '%'
 
-  document.getElementById('m-pet-slot').innerHTML = creature.pet
-    ? `<span style="font-size:1.2rem">${creature.pet.sprite}</span><span>${creature.pet.name} — ${creature.pet.bonus}</span>`
-    : `<span style="font-size:1.2rem">🐾</span><span>Assign a pet companion</span>`
+  const petSlot = document.getElementById('m-pet-slot')
+  if (creature.pet) {
+    petSlot.innerHTML = `
+      <span style="font-size:1.4rem">${creature.pet.icon}</span>
+      <div>
+        <div style="font-size:0.88rem;font-weight:600;">${creature.pet.name}</div>
+        <div style="font-size:0.75rem;color:var(--accent);">${creature.pet.desc}</div>
+      </div>
+      <span style="margin-left:auto;font-size:0.72rem;color:var(--muted);">Tap to change</span>`
+  } else {
+    petSlot.innerHTML = `<span style="font-size:1.2rem">🐾</span><span>Assign a pet companion</span>`
+  }
 
   document.getElementById('creature-modal').classList.add('open')
 }
 window.openCreatureModal = openCreatureModal
 
 function checkEvolution(creature) {
-  if (creature.xp >= (creature.evolves_at_xp || 100)) {
+  const xpMult = creature.pet?.bonusType === 'xp_boost' ? (1 + (creature.pet.bonusValue || 0)) : 1
+  const threshold = creature.evolves_at_xp || 100
+  if (creature.xp >= threshold) {
     creature.level++
     creature.xp = 0
     creature.base_hp = Math.round(creature.base_hp * 1.1)
@@ -549,14 +792,16 @@ document.getElementById('crush-target-confirm').addEventListener('click', async 
   const others = state.collection.filter((_, idx) => idx !== crushSourceIdx)
   const target = others[crushTargetIdx]
   const targetId = target._id
+  const xpMult = target.pet?.bonusType === 'xp_boost' ? (1 + (target.pet.bonusValue || 0)) : 1
+  const effectiveXp = Math.round(xpGain * xpMult)
 
-  target.xp = (target.xp || 0) + xpGain
+  target.xp = (target.xp || 0) + effectiveXp
   checkEvolution(target)
   await persistCreatureXP(target)
 
   state.totalCrushes = (state.totalCrushes || 0) + 1
   state.collection.splice(crushSourceIdx, 1)
-  await persistCrush(crushedId, targetId, xpGain)
+  await persistCrush(crushedId, targetId, effectiveXp)
 
   const newTargetIdx = state.collection.indexOf(target)
   document.getElementById('crush-target-modal').classList.remove('open')
@@ -860,6 +1105,31 @@ window.shopBuyAvatar = function(key, cost) {
   updateUI()
   showToast(`${av.icon} ${av.label} unlocked! Set it in your Profile.`)
 }
+
+// ── MOBILE SIDEBAR DRAWER ────────────────────────────────
+const hamburgerBtn   = document.getElementById('hamburger-btn')
+const sidebarBackdrop = document.getElementById('sidebar-backdrop')
+
+function openSidebar()  { document.body.classList.add('sidebar-open') }
+function closeSidebar() { document.body.classList.remove('sidebar-open') }
+function toggleSidebar() {
+  document.body.classList.toggle('sidebar-open')
+}
+
+hamburgerBtn?.addEventListener('click', toggleSidebar)
+sidebarBackdrop?.addEventListener('click', closeSidebar)
+
+// Close drawer when a nav item is tapped on mobile
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (window.innerWidth <= 768) closeSidebar()
+  })
+})
+
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSidebar()
+})
 
 const logoutButton = document.getElementById('logout-btn')
 logoutButton.addEventListener('click', async () => {

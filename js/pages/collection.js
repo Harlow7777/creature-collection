@@ -1,7 +1,15 @@
 import { rarityColor } from '../utils/rarity.js'
 
-export function statBox(label, val) {
-  return `<div class="stat-box"><div class="stat-label">${label}</div><div class="stat-val">${val}</div></div>`
+export function statBox(label, val, effective = null) {
+  const boosted = effective !== null && effective !== val
+  return `<div class="stat-box">
+    <div class="stat-label">${label}</div>
+    <div class="stat-val">${boosted
+      ? `<span style="text-decoration:line-through;color:var(--muted);font-size:0.75rem;">${val}</span>
+         <span style="color:var(--rare);">${effective}</span>`
+      : val}
+    </div>
+  </div>`
 }
 
 export function renderCollection(collection) {
